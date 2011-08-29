@@ -19,10 +19,13 @@ package org.apache.camel.language.simple.ast;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.Predicate;
+import org.apache.camel.builder.ExpressionBuilder;
 import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.ValueBuilder;
 import org.apache.camel.language.simple.BinaryOperatorType;
@@ -35,6 +38,9 @@ import org.apache.camel.util.ObjectHelper;
  * Represents a binary operator in the AST.
  */
 public class BinaryOperator extends BaseSimpleNode {
+
+    // this is special for the range operator where you define the range as from..to (where from and to are numbers)
+    private static final Pattern RANGE_PATTERN = Pattern.compile("^(\\d+)(\\.\\.)(\\d+)$");
 
     private final BinaryOperatorType operator;
     private SimpleNode left;
@@ -90,6 +96,8 @@ public class BinaryOperator extends BaseSimpleNode {
             return createRegexExpression(leftExp, rightExp);
         } else if (operator == BinaryOperatorType.IN || operator == BinaryOperatorType.NOT_IN) {
             return createInExpression(leftExp, rightExp);
+        } else if (operator == BinaryOperatorType.RANGE || operator == BinaryOperatorType.NOT_RANGE) {
+            return createRangeExpression(expression, leftExp, rightExp);
         }
 
         throw new SimpleParserException("Unknown binary operator " + operator, symbol.getIndex());
@@ -106,7 +114,7 @@ public class BinaryOperator extends BaseSimpleNode {
                 }
                 Class<?> rightType = exchange.getContext().getClassResolver().resolveClass(name);
                 if (rightType == null) {
-                    throw new SimpleIllegalSyntaxException(expression, left.getToken().getIndex(), operator + " operator cannot find class with name: " + name);
+                    throw new SimpleIllegalSyntaxException(expression, right.getToken().getIndex(), operator + " operator cannot find class with name: " + name);
                 }
 
                 predicate = PredicateBuilder.isInstanceOf(leftExp, rightType);
@@ -163,6 +171,40 @@ public class BinaryOperator extends BaseSimpleNode {
                 if (operator == BinaryOperatorType.NOT_IN) {
                     predicate = PredicateBuilder.not(predicate);
                 }
+                boolean answer = predicate.matches(exchange);
+                return exchange.getContext().getTypeConverter().convertTo(type, answer);
+            }
+
+            @Override
+            public String toString() {
+                return left + " " + symbol.getText() + " " + right;
+            }
+        };
+    }
+
+    private Expression createRangeExpression(final String expression, final Expression leftExp, final Expression rightExp) {
+        return new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                Predicate predicate;
+
+                String range = rightExp.evaluate(exchange, String.class);
+                Matcher matcher = RANGE_PATTERN.matcher(range);
+                if (matcher.matches()) {
+                    // wrap as constant expression for the from and to values
+                    Expression from = ExpressionBuilder.constantExpression(matcher.group(1));
+                    Expression to = ExpressionBuilder.constantExpression(matcher.group(3));
+
+                    // build a compound predicate for the range
+                    predicate = PredicateBuilder.isGreaterThanOrEqualTo(leftExp, from);
+                    predicate = PredicateBuilder.and(predicate, PredicateBuilder.isLessThanOrEqualTo(leftExp, to));
+                } else {
+                    throw new SimpleIllegalSyntaxException(expression, right.getToken().getIndex(), operator + " operator is not valid. Valid syntax:'from..to' (where from and to are numbers).");
+                }
+                if (operator == BinaryOperatorType.NOT_RANGE) {
+                    predicate = PredicateBuilder.not(predicate);
+                }
+
                 boolean answer = predicate.matches(exchange);
                 return exchange.getContext().getTypeConverter().convertTo(type, answer);
             }
