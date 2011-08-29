@@ -68,7 +68,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
         while (!token.getType().isEol()) {
             // predicate supports quotes, functions, operators and whitespaces
             if (!singleQuotedText() && !doubleQuotedText() && !functionText() && !unaryOperator() && !binaryOperator() && !logicalOperator()
-                    && !whiteSpaceText() && !token.getType().isEol()) {
+                    && !token.getType().isWhitespace() && !token.getType().isEol()) {
                 // okay the symbol was not one of the above, so its not supported
                 // use the previous index as that is where the problem is
                 throw new SimpleParserException("unexpected " + token.getType().getType() + " symbol", previousIndex);
@@ -368,6 +368,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
     protected boolean singleQuotedText() {
         if (accept(TokenType.singleQuote)) {
+            nextToken();
             while (!token.getType().isSingleQuote() && !token.getType().isEol()) {
                 // we need to loop until we find the ending single quote, or the eol
                 nextToken();
@@ -380,6 +381,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
     protected boolean doubleQuotedText() {
         if (accept(TokenType.doubleQuote)) {
+            nextToken();
             while (!token.getType().isDoubleQuote() && !token.getType().isEol()) {
                 // we need to loop until we find the ending double quote, or the eol
                 nextToken();
@@ -392,6 +394,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
     protected boolean functionText() {
         if (accept(TokenType.functionStart)) {
+            nextToken();
             while (!token.getType().isFunctionEnd() && !token.getType().isEol()) {
                 // we need to loop until we find the ending function quote, or the eol
                 nextToken();
@@ -402,12 +405,9 @@ public class SimplePredicateParser extends BaseSimpleParser {
         return false;
     }
 
-    protected boolean whiteSpaceText() {
-        return token.getType().isWhitespace();
-    }
-
     protected boolean unaryOperator() {
         if (accept(TokenType.unaryOperator)) {
+            nextToken();
             // there should be a whitespace after the operator
             expect(TokenType.whiteSpace);
             return true;
@@ -417,6 +417,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
     protected boolean binaryOperator() {
         if (accept(TokenType.binaryOperator)) {
+            nextToken();
             // there should be at least one whitespace after the operator
             expectAndAcceptMore(TokenType.whiteSpace);
 
@@ -437,6 +438,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
     protected boolean logicalOperator() {
         if (accept(TokenType.logicalOperator)) {
+            nextToken();
             // there should be at least one whitespace after the operator
             expectAndAcceptMore(TokenType.whiteSpace);
 
@@ -456,18 +458,27 @@ public class SimplePredicateParser extends BaseSimpleParser {
     }
 
     protected boolean numericValue() {
-        // do not use accept as it will advance which we do not want to at current time
-        return token.getType().getType() == TokenType.numericValue;
+        if (accept(TokenType.numericValue)) {
+            // no other tokens to check so do not use nextToken
+            return true;
+        }
+        return false;
     }
 
     protected boolean booleanValue() {
-        // do not use accept as it will advance which we do not want to at current time
-        return token.getType().getType() == TokenType.booleanValue;
+        if (accept(TokenType.booleanValue)) {
+            // no other tokens to check so do not use nextToken
+            return true;
+        }
+        return false;
     }
 
     protected boolean nullValue() {
-        // do not use accept as it will advance which we do not want to at current time
-        return token.getType().getType() == TokenType.nullValue;
+        if (accept(TokenType.nullValue)) {
+            // no other tokens to check so do not use nextToken
+            return true;
+        }
+        return false;
     }
 
 }

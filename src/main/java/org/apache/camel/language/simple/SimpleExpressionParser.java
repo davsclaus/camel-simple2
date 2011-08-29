@@ -165,6 +165,7 @@ public class SimpleExpressionParser extends BaseSimpleParser {
 
     protected boolean functionText() {
         if (accept(TokenType.functionStart)) {
+            nextToken();
             while (!token.getType().isFunctionEnd() && !token.getType().isEol()) {
                 // we need to loop until we find the ending function quote, or the eol
                 nextToken();

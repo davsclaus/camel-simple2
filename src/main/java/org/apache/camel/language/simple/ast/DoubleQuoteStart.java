@@ -33,6 +33,7 @@ public class DoubleQuoteStart extends BaseSimpleNode implements BlockStart {
 
     @Override
     public String toString() {
+        // output a nice toString so it makes debugging easier as we can see the entire block
         return "\"" + block + "\"";
     }
 

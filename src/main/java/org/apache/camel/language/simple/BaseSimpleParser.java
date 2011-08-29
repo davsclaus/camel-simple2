@@ -146,7 +146,6 @@ public abstract class BaseSimpleParser {
      */
     protected boolean accept(TokenType accept) {
         if (token == null || token.getType().getType() == accept) {
-            nextToken();
             return true;
         } else {
             return false;
