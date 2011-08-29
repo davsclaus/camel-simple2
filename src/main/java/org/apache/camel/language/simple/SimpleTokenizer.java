@@ -45,8 +45,12 @@ public class SimpleTokenizer {
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, ">"));
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "<"));
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "!="));
-        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "is"));
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "not is"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "is"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "not contains"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "contains"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "not regex"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "regex"));
 
         // unary operators
         knownTokens.add(new SimpleTokenType(TokenType.unaryOperator, "++"));

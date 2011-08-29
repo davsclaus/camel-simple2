@@ -75,8 +75,14 @@ public class BinaryOperator extends BaseSimpleNode {
             return createExpression(leftExp, rightExp, PredicateBuilder.isLessThanOrEqualTo(leftExp, rightExp));
         } else if (operator == BinaryOperatorType.NOT_EQ) {
             return createExpression(leftExp, rightExp, PredicateBuilder.isNotEqualTo(leftExp, rightExp));
+        } else if (operator == BinaryOperatorType.CONTAINS) {
+            return createExpression(leftExp, rightExp, PredicateBuilder.contains(leftExp, rightExp));
+        } else if (operator == BinaryOperatorType.NOT_CONTAINS) {
+            return createExpression(leftExp, rightExp, PredicateBuilder.not(PredicateBuilder.contains(leftExp, rightExp)));
         } else if (operator == BinaryOperatorType.IS || operator == BinaryOperatorType.NOT_IS) {
             return createIsExpression(expression, leftExp, rightExp);
+        } else if (operator == BinaryOperatorType.REGEX || operator == BinaryOperatorType.NOT_REGEX) {
+            return createRegexExpression(leftExp, rightExp);
         }
 
         throw new SimpleParserException("Unknown binary operator " + operator, symbol.getIndex());
@@ -102,6 +108,26 @@ public class BinaryOperator extends BaseSimpleNode {
                 }
                 boolean answer = predicate.matches(exchange);
 
+                return exchange.getContext().getTypeConverter().convertTo(type, answer);
+            }
+
+            @Override
+            public String toString() {
+                return left + " " + symbol.getText() + " " + right;
+            }
+        };
+    }
+
+    private Expression createRegexExpression(final Expression leftExp, final Expression rightExp) {
+        return new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                // reg ex should use String pattern, so we evaluate the right hand side as a String
+                Predicate predicate = PredicateBuilder.regex(leftExp, rightExp.evaluate(exchange, String.class));
+                if (operator == BinaryOperatorType.NOT_REGEX) {
+                    predicate = PredicateBuilder.not(predicate);
+                }
+                boolean answer = predicate.matches(exchange);
                 return exchange.getContext().getTypeConverter().convertTo(type, answer);
             }
 
