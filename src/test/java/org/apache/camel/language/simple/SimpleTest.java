@@ -657,15 +657,15 @@ public class SimpleTest extends LanguageTestSupport {
 
         exchange.getIn().setBody(camel);
 
-        assertExpression("${in.body.getName} contains 'Camel'", true);
-        assertExpression("${in.body.getName} contains 'Tiger'", false);
-        assertExpression("${in.body.getAge} < 10", true);
-        assertExpression("${in.body.getAge} > 10", false);
-        assertExpression("${in.body.getAge} <= '6'", true);
-        assertExpression("${in.body.getAge} > '6'", false);
+        assertPredicate("${in.body.getName} contains 'Camel'", true);
+        assertPredicate("${in.body.getName} contains 'Tiger'", false);
+        assertPredicate("${in.body.getAge} < 10", true);
+        assertPredicate("${in.body.getAge} > 10", false);
+        assertPredicate("${in.body.getAge} <= '6'", true);
+        assertPredicate("${in.body.getAge} > '6'", false);
 
-        assertExpression("${in.body.getAge} < ${body.getFriend.getAge}'", true);
-        assertExpression("${in.body.getFriend.isDangerous} == true", true);
+        assertPredicate("${in.body.getAge} < ${body.getFriend.getAge}", true);
+        assertPredicate("${in.body.getFriend.isDangerous} == true", true);
     }
 
     @Test
@@ -676,15 +676,15 @@ public class SimpleTest extends LanguageTestSupport {
 
         exchange.getIn().setBody(camel);
 
-        assertExpression("${in.body.name} contains 'Camel'", true);
-        assertExpression("${in.body.name} contains 'Tiger'", false);
-        assertExpression("${in.body.age} < 10", true);
-        assertExpression("${in.body.age} > 10", false);
-        assertExpression("${in.body.age} <= '6'", true);
-        assertExpression("${in.body.age} > '6'", false);
+        assertPredicate("${in.body.name} contains 'Camel'", true);
+        assertPredicate("${in.body.name} contains 'Tiger'", false);
+        assertPredicate("${in.body.age} < 10", true);
+        assertPredicate("${in.body.age} > 10", false);
+        assertPredicate("${in.body.age} <= '6'", true);
+        assertPredicate("${in.body.age} > '6'", false);
 
-        assertExpression("${in.body.age} < ${body.friend.age}'", true);
-        assertExpression("${in.body.friend.dangerous} == true", true);
+        assertPredicate("${in.body.age} < ${body.friend.age}", true);
+        assertPredicate("${in.body.friend.dangerous} == true", true);
     }
 
     @Test

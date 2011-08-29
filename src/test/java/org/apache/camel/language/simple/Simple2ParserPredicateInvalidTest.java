@@ -45,7 +45,6 @@ public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
             parser.parsePredicate();
             fail("Should thrown exception");
         } catch (SimpleIllegalSyntaxException e) {
-            e.printStackTrace();
             assertEquals(15, e.getIndex());
         }
     }

@@ -109,8 +109,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
         SimpleNode lastSingle = null;
         SimpleNode lastDouble = null;
         SimpleNode lastFunction = null;
-        AtomicBoolean startSingle = new AtomicBoolean(true);
-        AtomicBoolean startDouble = new AtomicBoolean(true);
+        AtomicBoolean startSingle = new AtomicBoolean(false);
+        AtomicBoolean startDouble = new AtomicBoolean(false);
         AtomicBoolean startFunction = new AtomicBoolean(false);
 
         LiteralNode imageToken = null;
@@ -157,11 +157,11 @@ public class SimplePredicateParser extends BaseSimpleParser {
         }
 
         // validate the single, double quote pairs and functions is in balance
-        if (!startSingle.get()) {
+        if (startSingle.get()) {
             int index = lastSingle != null ? lastSingle.getToken().getIndex() : 0;
             throw new SimpleParserException("single quote has no ending quote", index);
         }
-        if (!startDouble.get()) {
+        if (startDouble.get()) {
             int index = lastDouble != null ? lastDouble.getToken().getIndex() : 0;
             throw new SimpleParserException("double quote has no ending quote", index);
         }
@@ -187,29 +187,41 @@ public class SimplePredicateParser extends BaseSimpleParser {
             return null;
         }
 
-        // for predicates we support quotes and operators (eg binary is predicates)
-        // and the quotes is needed for predicate expressions as its more of a programming language
-        // than an expression which is more template based
-        if (token.getType().isUnary()) {
-            return new UnaryOperator(token);
-        } else if (token.getType().isSingleQuote()) {
+        // okay so far we also want to support quotes
+        if (token.getType().isSingleQuote()) {
+            SimpleNode answer;
             boolean start = startSingle.get();
+            if (!start) {
+                answer = new SingleQuoteStart(token);
+            } else {
+                answer = new SingleQuoteEnd(token);
+            }
             // flip state on start/end flag
             startSingle.set(!start);
-            if (start) {
-                return new SingleQuoteStart(token);
-            } else {
-                return new SingleQuoteEnd(token);
-            }
+            return answer;
         } else if (token.getType().isDoubleQuote()) {
+            SimpleNode answer;
             boolean start = startDouble.get();
+            if (!start) {
+                answer = new DoubleQuoteStart(token);
+            } else {
+                answer = new DoubleQuoteEnd(token);
+            }
             // flip state on start/end flag
             startDouble.set(!start);
-            if (start) {
-                return new DoubleQuoteStart(token);
-            } else {
-                return new DoubleQuoteEnd(token);
-            }
+            return answer;
+        }
+
+        // if we are inside a quote, then we do not support any further kind of tokens
+        // as we want to only support embedded functions and all other kinds to be literal tokens
+        if (startSingle.get() || startDouble.get()) {
+            return null;
+        }
+
+        // okay we are not inside a function or quote, so we want to support operators
+        // and the special null value as well
+        if (token.getType().isUnary()) {
+            return new UnaryOperator(token);
         } else if (token.getType().isBinary()) {
             return new BinaryOperator(token);
         } else if (token.getType().isNullValue()) {
