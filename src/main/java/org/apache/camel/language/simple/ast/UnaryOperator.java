@@ -55,6 +55,10 @@ public class UnaryOperator extends BaseSimpleNode {
         this.left = left;
     }
 
+    public UnaryOperatorType getOperator() {
+        return operator;
+    }
+
     @Override
     public Expression createExpression(String expression) {
         ObjectHelper.notNull(left, "left node", this);

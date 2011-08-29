@@ -66,6 +66,10 @@ public class BinaryOperator extends BaseSimpleNode {
         return true;
     }
 
+    public BinaryOperatorType getOperator() {
+        return operator;
+    }
+
     @Override
     public Expression createExpression(String expression) {
         ObjectHelper.notNull(left, "left node", this);

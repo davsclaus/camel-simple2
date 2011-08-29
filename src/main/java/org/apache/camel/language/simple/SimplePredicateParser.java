@@ -32,6 +32,7 @@ import org.apache.camel.language.simple.ast.FunctionEnd;
 import org.apache.camel.language.simple.ast.FunctionStart;
 import org.apache.camel.language.simple.ast.Literal;
 import org.apache.camel.language.simple.ast.LiteralNode;
+import org.apache.camel.language.simple.ast.LogicalOperator;
 import org.apache.camel.language.simple.ast.NullNode;
 import org.apache.camel.language.simple.ast.SimpleNode;
 import org.apache.camel.language.simple.ast.SingleQuoteEnd;
@@ -66,8 +67,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
         nextToken();
         while (!token.getType().isEol()) {
             // predicate supports quotes, functions, operators and whitespaces
-            if (!singleQuotedText() && !doubleQuotedText() && !functionText() && !unaryOperator() && !binaryOperator() && !whiteSpaceText()
-                    && !token.getType().isEol()) {
+            if (!singleQuotedText() && !doubleQuotedText() && !functionText() && !unaryOperator() && !binaryOperator() && !logicalOperator()
+                    && !whiteSpaceText() && !token.getType().isEol()) {
                 // okay the symbol was not one of the above, so its not supported
                 // use the previous index as that is where the problem is
                 throw new SimpleParserException("unexpected " + token.getType().getType() + " symbol", previousIndex);
@@ -89,6 +90,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
         stackUnaryOperators();
         // compact and stack binary operators
         stackBinaryOperators();
+        // compact and stack logical operators
+        stackLogicalOperators();
 
         // create and return as a Camel predicate
         List<Predicate> predicates = createPredicates();
@@ -224,6 +227,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
             return new UnaryOperator(token);
         } else if (token.getType().isBinary()) {
             return new BinaryOperator(token);
+        } else if (token.getType().isLogical()) {
+            return new LogicalOperator(token);
         } else if (token.getType().isNullValue()) {
             return new NullNode(token);
         }
@@ -250,8 +255,11 @@ public class SimplePredicateParser extends BaseSimpleParser {
     private void stackBinaryOperators() {
         Stack<SimpleNode> stack = new Stack<SimpleNode>();
 
+        SimpleNode left = null;
         for (int i = 0; i < nodes.size(); i++) {
-            SimpleNode left = i > 0 ? nodes.get(i - 1) : null;
+            if (left == null) {
+                left = i > 0 ? nodes.get(i - 1) : null;
+            }
             SimpleNode token = nodes.get(i);
             SimpleNode right = i < nodes.size() - 1 ? nodes.get(i + 1) : null;
 
@@ -275,7 +283,55 @@ public class SimplePredicateParser extends BaseSimpleParser {
                 stack.push(token);
                 // advantage after the right hand side
                 i++;
+                // this token is now the left for the next loop
+                left = token;
             } else {
+                // clear left
+                left = null;
+                stack.push(token);
+            }
+        }
+
+        nodes.clear();
+        nodes.addAll(stack);
+    }
+
+    private void stackLogicalOperators() {
+        Stack<SimpleNode> stack = new Stack<SimpleNode>();
+
+        SimpleNode left = null;
+        for (int i = 0; i < nodes.size(); i++) {
+            if (left == null) {
+                left = i > 0 ? nodes.get(i - 1) : null;
+            }
+            SimpleNode token = nodes.get(i);
+            SimpleNode right = i < nodes.size() - 1 ? nodes.get(i + 1) : null;
+
+            if (token instanceof LogicalOperator) {
+                LogicalOperator logical = (LogicalOperator) token;
+                if (left == null) {
+                    throw new SimpleParserException("no preceding token to use with logical operator ", token.getToken().getIndex());
+                }
+                if (!logical.acceptLeftNode(left)) {
+                    throw new SimpleParserException("preceding token not applicable to use with logical operator", token.getToken().getIndex());
+                }
+                if (right == null) {
+                    throw new SimpleParserException("no succeeding token to use with logical operator", token.getToken().getIndex());
+                }
+                if (!logical.acceptRightNode(right)) {
+                    throw new SimpleParserException("succeeding token not applicable to use with logical operator", token.getToken().getIndex());
+                }
+
+                // pop previous as we need to replace it with this binary operator
+                stack.pop();
+                stack.push(token);
+                // advantage after the right hand side
+                i++;
+                // this token is now the left for the next loop
+                left = token;
+            } else {
+                // clear left
+                left = null;
                 stack.push(token);
             }
         }
@@ -365,7 +421,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
             expectAndAcceptMore(TokenType.whiteSpace);
 
             // then we expect either some quoted text, another function, or a numeric, boolean or null value
-            if (singleQuotedText() || doubleQuotedText() || functionText() || numericText() || booleanText() || nullText()) {
+            if (singleQuotedText() || doubleQuotedText() || functionText() || numericValue() || booleanValue() || nullValue()) {
                 // then after the right hand side value, there should be a whitespace if there is more tokens
                 nextToken();
                 if (!token.getType().isEol()) {
@@ -379,28 +435,39 @@ public class SimplePredicateParser extends BaseSimpleParser {
         return false;
     }
 
-    protected boolean numericText() {
-        if (accept(TokenType.numericValue)) {
-            // no expectation what comes next
+    protected boolean logicalOperator() {
+        if (accept(TokenType.logicalOperator)) {
+            // there should be at least one whitespace after the operator
+            expectAndAcceptMore(TokenType.whiteSpace);
+
+            // then we expect either some quoted text, another function, or a numeric, boolean or null value
+            if (singleQuotedText() || doubleQuotedText() || functionText() || numericValue() || booleanValue() || nullValue()) {
+                // then after the right hand side value, there should be a whitespace if there is more tokens
+                nextToken();
+                if (!token.getType().isEol()) {
+                    expect(TokenType.whiteSpace);
+                }
+            } else {
+                throw new SimpleParserException(token.getType() + " not supported by logical operator", token.getIndex());
+            }
             return true;
         }
         return false;
     }
 
-    protected boolean booleanText() {
-        if (accept(TokenType.booleanValue)) {
-            // no expectation what comes next
-            return true;
-        }
-        return false;
+    protected boolean numericValue() {
+        // do not use accept as it will advance which we do not want to at current time
+        return token.getType().getType() == TokenType.numericValue;
     }
 
-    protected boolean nullText() {
-        if (accept(TokenType.nullValue)) {
-            // no expectation what comes next
-            return true;
-        }
-        return false;
+    protected boolean booleanValue() {
+        // do not use accept as it will advance which we do not want to at current time
+        return token.getType().getType() == TokenType.booleanValue;
+    }
+
+    protected boolean nullValue() {
+        // do not use accept as it will advance which we do not want to at current time
+        return token.getType().getType() == TokenType.nullValue;
     }
 
 }

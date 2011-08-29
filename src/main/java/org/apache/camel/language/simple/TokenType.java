@@ -25,7 +25,7 @@ public enum TokenType {
     booleanValue, numericValue, nullValue,
     singleQuote, doubleQuote,
     functionStart, functionEnd,
-    binaryOperator, unaryOperator,
+    binaryOperator, unaryOperator, logicalOperator,
     eol;
 
 }

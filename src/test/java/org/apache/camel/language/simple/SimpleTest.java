@@ -36,11 +36,8 @@ import org.apache.camel.language.bean.RuntimeBeanExpressionException;
 import org.apache.camel.test.junit4.LanguageTestSupport;
 import org.junit.Test;
 
-
-// TODO: unit test from camel-core, which simple2 should support as well
-
 /**
- *
+ * Unit test from camel-core, which simple2 should support as well
  */
 public class SimpleTest extends LanguageTestSupport {
 

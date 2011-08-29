@@ -21,10 +21,8 @@ import org.apache.camel.impl.JndiRegistry;
 import org.apache.camel.test.junit4.LanguageTestSupport;
 import org.junit.Test;
 
-// TODO: unit test from camel-core, which simple2 should support as well
-
 /**
- *
+ * Unit test from camel-core which simple2 should support as well
  */
 public class SimpleOperatorTest extends LanguageTestSupport {
 
@@ -54,94 +52,82 @@ public class SimpleOperatorTest extends LanguageTestSupport {
 
     @Test
     public void testAnd() throws Exception {
-        assertPredicate("${in.header.foo} == abc and ${in.header.bar} == 123", true);
-        assertPredicate("${in.header.foo} == abc and ${in.header.bar} == 444", false);
-        assertPredicate("${in.header.foo} == def and ${in.header.bar} == 123", false);
-        assertPredicate("${in.header.foo} == def and ${in.header.bar} == 444", false);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} == 123", true);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} == 444", false);
+        assertPredicate("${in.header.foo} == 'def' && ${in.header.bar} == 123", false);
+        assertPredicate("${in.header.foo} == 'def' && ${in.header.bar} == 444", false);
 
-        assertPredicate("${in.header.foo} == abc and ${in.header.bar} > 100", true);
-        assertPredicate("${in.header.foo} == abc and ${in.header.bar} < 200", true);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} > 100", true);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} < 200", true);
     }
 
     @Test
     public void testTwoAnd() throws Exception {
         exchange.getIn().setBody("Hello World");
-        assertPredicate("${in.header.foo} == abc and ${in.header.bar} == 123 and ${body} == 'Hello World'", true);
-        assertPredicate("${in.header.foo} == 'abc' and ${in.header.bar} == 123 and ${body} == 'Hello World'", true);
-        assertPredicate("${in.header.foo} == abc and ${in.header.bar} == 123 and ${body} == 'Bye World'", false);
-        assertPredicate("${in.header.foo} == 'abc' and ${in.header.bar} == 123 and ${body} == 'Bye World'", false);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} == 123 && ${body} == 'Hello World'", true);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} == 123 && ${body} == 'Bye World'", false);
     }
 
     @Test
     public void testThreeAnd() throws Exception {
         exchange.getIn().setBody("Hello World");
-        assertPredicate("${in.header.foo} == abc and ${in.header.bar} == 123 and ${body} == 'Hello World' and ${in.header.xx}} == null", true);
-        assertPredicate("${in.header.foo} == 'abc' and ${in.header.bar} == 123 and ${body} == 'Hello World' and ${in.header.xx}} == null", true);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} == 123 && ${body} == 'Hello World' && ${in.header.xx} == null", true);
     }
 
     @Test
     public void testTwoOr() throws Exception {
         exchange.getIn().setBody("Hello World");
-        assertPredicate("${in.header.foo} == abc or ${in.header.bar} == 44 or ${body} == 'Bye World'", true);
-        assertPredicate("${in.header.foo} == 'abc' or ${in.header.bar} == 44 or ${body} == 'Bye World'", true);
-        assertPredicate("${in.header.foo} == xxx or ${in.header.bar} == 44 or ${body} == 'Bye World'", false);
-        assertPredicate("${in.header.foo} == 'xxx' or ${in.header.bar} == 44 or ${body} == 'Bye World'", false);
-        assertPredicate("${in.header.foo} == xxx or ${in.header.bar} == 44 or ${body} == 'Hello World'", true);
-        assertPredicate("${in.header.foo} == 'xxx' or ${in.header.bar} == 44 or ${body} == 'Hello World'", true);
-        assertPredicate("${in.header.foo} == xxx or ${in.header.bar} == 123 or ${body} == 'Bye World'", true);
-        assertPredicate("${in.header.foo} == 'xxx' or ${in.header.bar} == 123 or ${body} == 'Bye World'", true);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} == 44 || ${body} == 'Bye World'", true);
+        assertPredicate("${in.header.foo} == 'xxx' || ${in.header.bar} == 44 || ${body} == 'Bye World'", false);
+        assertPredicate("${in.header.foo} == 'xxx' || ${in.header.bar} == 44 || ${body} == 'Hello World'", true);
+        assertPredicate("${in.header.foo} == 'xxx' || ${in.header.bar} == 123 || ${body} == 'Bye World'", true);
     }
 
     @Test
     public void testThreeOr() throws Exception {
         exchange.getIn().setBody("Hello World");
-        assertPredicate("${in.header.foo} == xxx or ${in.header.bar} == 44 or ${body} == 'Bye Moon' or ${body} contains 'World'", true);
-        assertPredicate("${in.header.foo} == 'xxx' or ${in.header.bar} == 44 or ${body} == 'Bye Moon' or ${body} contains 'World'", true);
-        assertPredicate("${in.header.foo} == xxx or ${in.header.bar} == 44 or ${body} == 'Bye Moon' or ${body} contains 'Moon'", false);
-        assertPredicate("${in.header.foo} == 'xxx' or ${in.header.bar} == 44 or ${body} == 'Bye Moon' or ${body} contains 'Moon'", false);
-        assertPredicate("${in.header.foo} == abc or ${in.header.bar} == 44 or ${body} == 'Bye Moon' or ${body} contains 'Moon'", true);
-        assertPredicate("${in.header.foo} == 'abc' or ${in.header.bar} == 44 or ${body} == 'Bye Moon' or ${body} contains 'Moon'", true);
-        assertPredicate("${in.header.foo} == xxx or ${in.header.bar} == 123 or ${body} == 'Bye Moon' or ${body} contains 'Moon'", true);
-        assertPredicate("${in.header.foo} == 'xxx' or ${in.header.bar} == 123 or ${body} == 'Bye Moon' or ${body} contains 'Moon'", true);
-        assertPredicate("${in.header.foo} == xxx or ${in.header.bar} == 44 or ${body} == 'Hello World' or ${body} contains 'Moon'", true);
-        assertPredicate("${in.header.foo} == 'xxx' or ${in.header.bar} == 44 or ${body} == 'Hello World' or ${body} contains 'Moon'", true);
+        assertPredicate("${in.header.foo} == 'xxx' || ${in.header.bar} == 44 || ${body} == 'Bye Moon' || ${body} contains 'World'", true);
+        assertPredicate("${in.header.foo} == 'xxx' || ${in.header.bar} == 44 || ${body} == 'Bye Moon' || ${body} contains 'Moon'", false);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} == 44 || ${body} == 'Bye Moon' || ${body} contains 'Moon'", true);
+        assertPredicate("${in.header.foo} == 'xxx' || ${in.header.bar} == 123 || ${body} == 'Bye Moon' || ${body} contains 'Moon'", true);
+        assertPredicate("${in.header.foo} == 'xxx' || ${in.header.bar} == 44 || ${body} == 'Hello World' || ${body} contains 'Moon'", true);
     }
 
     @Test
     public void testAndWithQuotation() throws Exception {
-        assertPredicate("${in.header.foo} == 'abc' and ${in.header.bar} == '123'", true);
-        assertPredicate("${in.header.foo} == 'abc' and ${in.header.bar} == '444'", false);
-        assertPredicate("${in.header.foo} == 'def' and ${in.header.bar} == '123'", false);
-        assertPredicate("${in.header.foo} == 'def' and ${in.header.bar} == '444'", false);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} == '123'", true);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} == '444'", false);
+        assertPredicate("${in.header.foo} == 'def' && ${in.header.bar} == '123'", false);
+        assertPredicate("${in.header.foo} == 'def' && ${in.header.bar} == '444'", false);
 
-        assertPredicate("${in.header.foo} == 'abc' and ${in.header.bar} > '100'", true);
-        assertPredicate("${in.header.foo} == 'abc' and ${in.header.bar} < '200'", true);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} > '100'", true);
+        assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} < '200'", true);
     }
 
     @Test
     public void testOr() throws Exception {
-        assertPredicate("${in.header.foo} == abc or ${in.header.bar} == 123", true);
-        assertPredicate("${in.header.foo} == abc or ${in.header.bar} == 444", true);
-        assertPredicate("${in.header.foo} == def or ${in.header.bar} == 123", true);
-        assertPredicate("${in.header.foo} == def or ${in.header.bar} == 444", false);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} == 123", true);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} == 444", true);
+        assertPredicate("${in.header.foo} == 'def' || ${in.header.bar} == 123", true);
+        assertPredicate("${in.header.foo} == 'def' || ${in.header.bar} == 444", false);
 
-        assertPredicate("${in.header.foo} == abc or ${in.header.bar} < 100", true);
-        assertPredicate("${in.header.foo} == abc or ${in.header.bar} < 200", true);
-        assertPredicate("${in.header.foo} == def or ${in.header.bar} < 200", true);
-        assertPredicate("${in.header.foo} == def or ${in.header.bar} < 100", false);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} < 100", true);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} < 200", true);
+        assertPredicate("${in.header.foo} == 'def' || ${in.header.bar} < 200", true);
+        assertPredicate("${in.header.foo} == 'def' || ${in.header.bar} < 100", false);
     }
 
     @Test
     public void testOrWithQuotation() throws Exception {
-        assertPredicate("${in.header.foo} == 'abc' or ${in.header.bar} == '123'", true);
-        assertPredicate("${in.header.foo} == 'abc' or ${in.header.bar} == '444'", true);
-        assertPredicate("${in.header.foo} == 'def' or ${in.header.bar} == '123'", true);
-        assertPredicate("${in.header.foo} == 'def' or ${in.header.bar} == '444'", false);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} == '123'", true);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} == '444'", true);
+        assertPredicate("${in.header.foo} == 'def' || ${in.header.bar} == '123'", true);
+        assertPredicate("${in.header.foo} == 'def' || ${in.header.bar} == '444'", false);
 
-        assertPredicate("${in.header.foo} == 'abc' or ${in.header.bar} < '100'", true);
-        assertPredicate("${in.header.foo} == 'abc' or ${in.header.bar} < '200'", true);
-        assertPredicate("${in.header.foo} == 'def' or ${in.header.bar} < '200'", true);
-        assertPredicate("${in.header.foo} == 'def' or ${in.header.bar} < '100'", false);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} < '100'", true);
+        assertPredicate("${in.header.foo} == 'abc' || ${in.header.bar} < '200'", true);
+        assertPredicate("${in.header.foo} == 'def' || ${in.header.bar} < '200'", true);
+        assertPredicate("${in.header.foo} == 'def' || ${in.header.bar} < '100'", false);
     }
 
     @Test
@@ -429,11 +415,10 @@ public class SimpleOperatorTest extends LanguageTestSupport {
             assertTrue(e.getMessage().contains("range operator is not valid. Valid syntax:'from..to' (where from and to are numbers)."));
         }
 
-        // TODO: and|or not yet supported
-//        assertPredicate("${in.header.bar} range '100..200' and ${in.header.foo} == abc" , true);
-//        assertPredicate("${in.header.bar} range '200..300' and ${in.header.foo} == abc" , false);
-//        assertPredicate("${in.header.bar} range '200..300' or ${in.header.foo} == abc" , true);
-//        assertPredicate("${in.header.bar} range '200..300' or ${in.header.foo} == def" , false);
+        assertPredicate("${in.header.bar} range '100..200' && ${in.header.foo} == 'abc'" , true);
+        assertPredicate("${in.header.bar} range '200..300' && ${in.header.foo} == 'abc'" , false);
+        assertPredicate("${in.header.bar} range '200..300' || ${in.header.foo} == 'abc'" , true);
+        assertPredicate("${in.header.bar} range '200..300' || ${in.header.foo} == 'def'" , false);
     }
 
     @Test

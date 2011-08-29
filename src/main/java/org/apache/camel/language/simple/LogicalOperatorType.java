@@ -14,27 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.camel.language.simple.ast;
-
-import org.apache.camel.language.simple.SimpleToken;
+package org.apache.camel.language.simple;
 
 /**
- * Base class for {@link SimpleNode} nodes.
+ * Types of logical operators supported
  */
-public abstract class BaseSimpleNode implements SimpleNode {
+public enum LogicalOperatorType {
 
-    protected final SimpleToken token;
+    AND, OR;
 
-    protected BaseSimpleNode(SimpleToken token) {
-        this.token = token;
+    public static LogicalOperatorType asOperator(String text) {
+        if ("&&".equals(text)) {
+            return AND;
+        } else if ("||".equals(text)) {
+            return OR;
+        }
+        throw new IllegalArgumentException("Operator not supported: " + text);
     }
 
-    public SimpleToken getToken() {
-        return token;
+    public String getOperatorText(LogicalOperatorType operator) {
+        if (operator == AND) {
+            return "&&";
+        } else if (operator == OR) {
+            return "||";
+        }
+        return "";
     }
 
     @Override
     public String toString() {
-        return token.getText();
+        return getOperatorText(this);
     }
+
 }

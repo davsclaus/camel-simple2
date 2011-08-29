@@ -101,6 +101,13 @@ public class SimpleTokenType {
     }
 
     /**
+     * Whether the type is logical operator
+     */
+    public boolean isLogical() {
+        return type == TokenType.logicalOperator;
+    }
+
+    /**
      * Whether the type is a null value
      */
     public boolean isNullValue() {

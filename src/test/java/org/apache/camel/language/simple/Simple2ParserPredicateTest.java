@@ -108,4 +108,38 @@ public class Simple2ParserPredicateTest extends ExchangeTestSupport {
         assertTrue("Should match", pre.matches(exchange));
     }
 
+    public void testSimple2LogicalAnd() throws Exception {
+        exchange.getIn().setBody("Hello");
+        exchange.getIn().setHeader("high", true);
+        exchange.getIn().setHeader("foo", 123);
+
+        SimplePredicateParser parser = new SimplePredicateParser("${header.high} == true && ${header.foo} == 123");
+        Predicate pre = parser.parsePredicate();
+
+        assertTrue("Should match", pre.matches(exchange));
+    }
+
+    public void testSimple2LogicalOr() throws Exception {
+        exchange.getIn().setBody("Hello");
+        exchange.getIn().setHeader("high", true);
+        exchange.getIn().setHeader("foo", 123);
+
+        SimplePredicateParser parser = new SimplePredicateParser("${header.high} == false || ${header.foo} == 123");
+        Predicate pre = parser.parsePredicate();
+
+        assertTrue("Should match", pre.matches(exchange));
+    }
+
+    public void testSimple2LogicalAndAnd() throws Exception {
+        exchange.getIn().setBody("Hello");
+        exchange.getIn().setHeader("high", true);
+        exchange.getIn().setHeader("foo", 123);
+        exchange.getIn().setHeader("bar", "beer");
+
+        SimplePredicateParser parser = new SimplePredicateParser("${header.high} == true && ${header.foo} == 123 && ${header.bar} == 'beer'");
+        Predicate pre = parser.parsePredicate();
+
+        assertTrue("Should match", pre.matches(exchange));
+    }
+
 }

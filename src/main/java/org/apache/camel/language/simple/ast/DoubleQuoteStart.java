@@ -32,6 +32,11 @@ public class DoubleQuoteStart extends BaseSimpleNode implements BlockStart {
     }
 
     @Override
+    public String toString() {
+        return "\"" + block + "\"";
+    }
+
+    @Override
     public Expression createExpression(String expression) {
         if (block != null) {
             return block.createExpression(expression);

@@ -59,6 +59,10 @@ public class SimpleTokenizer {
         // unary operators
         knownTokens.add(new SimpleTokenType(TokenType.unaryOperator, "++"));
         knownTokens.add(new SimpleTokenType(TokenType.unaryOperator, "--"));
+
+        // logical operators
+        knownTokens.add(new SimpleTokenType(TokenType.logicalOperator, "&&"));
+        knownTokens.add(new SimpleTokenType(TokenType.logicalOperator, "||"));
     }
 
     /**

@@ -22,7 +22,7 @@ package org.apache.camel.language.simple;
 public enum BinaryOperatorType {
 
     EQ, GT, GTE, LT, LTE, NOT_EQ, CONTAINS, NOT_CONTAINS, REGEX, NOT_REGEX,
-    IN, NOT_IN, IS, NOT_IS, RANGE, NOT_RANGE, AND, OR;
+    IN, NOT_IN, IS, NOT_IS, RANGE, NOT_RANGE;
 
     public static BinaryOperatorType asOperator(String text) {
         if ("==".equals(text)) {
@@ -57,10 +57,6 @@ public enum BinaryOperatorType {
             return RANGE;
         } else if ("not range".equals(text)) {
             return NOT_RANGE;
-        } else if ("and".equals(text)) {
-            return AND;
-        } else if ("or".equals(text)) {
-            return OR;
         }
         throw new IllegalArgumentException("Operator not supported: " + text);
     }
@@ -98,10 +94,6 @@ public enum BinaryOperatorType {
             return "range";
         } else if (operator == NOT_RANGE) {
             return "not range";
-        } else if (operator == AND) {
-            return "and";
-        } else if (operator == OR) {
-            return "or";
         }
         return "";
     }
