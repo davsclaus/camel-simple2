@@ -36,12 +36,17 @@ public class SimpleTokenizer {
         knownTokens.add(new SimpleTokenType(TokenType.functionEnd, "}"));
         knownTokens.add(new SimpleTokenType(TokenType.booleanValue, "true"));
         knownTokens.add(new SimpleTokenType(TokenType.booleanValue, "false"));
-        knownTokens.add(new SimpleTokenType(TokenType.booleanValue, "null"));
+        knownTokens.add(new SimpleTokenType(TokenType.nullValue, "null"));
 
         // binary operators
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "=="));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, ">="));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "<="));
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, ">"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "<"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "!="));
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "is"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "not is"));
 
         // unary operators
         knownTokens.add(new SimpleTokenType(TokenType.unaryOperator, "++"));

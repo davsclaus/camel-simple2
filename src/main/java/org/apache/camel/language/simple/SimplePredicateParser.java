@@ -32,6 +32,7 @@ import org.apache.camel.language.simple.ast.FunctionEnd;
 import org.apache.camel.language.simple.ast.FunctionStart;
 import org.apache.camel.language.simple.ast.Literal;
 import org.apache.camel.language.simple.ast.LiteralNode;
+import org.apache.camel.language.simple.ast.NullNode;
 import org.apache.camel.language.simple.ast.SimpleNode;
 import org.apache.camel.language.simple.ast.SingleQuoteEnd;
 import org.apache.camel.language.simple.ast.SingleQuoteStart;
@@ -194,6 +195,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
             }
         } else if (token.getType().isBinary()) {
             return new BinaryOperator(token);
+        } else if (token.getType().isNullValue()) {
+            return new NullNode(token);
         }
 
         // by returning null, we will let the parser determine what to do
@@ -262,6 +265,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
                 // pop previous as we need to replace it with this binary operator
                 stack.pop();
                 stack.push(token);
+                // advantage after the right hand side
+                i++;
             } else {
                 stack.push(token);
             }

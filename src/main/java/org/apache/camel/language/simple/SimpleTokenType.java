@@ -100,6 +100,13 @@ public class SimpleTokenType {
         return type == TokenType.unaryOperator;
     }
 
+    /**
+     * Whether the type is a null value
+     */
+    public boolean isNullValue() {
+        return type == TokenType.nullValue;
+    }
+
     @Override
     public String toString() {
         return value;

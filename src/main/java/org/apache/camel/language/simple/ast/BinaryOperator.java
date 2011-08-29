@@ -67,6 +67,14 @@ public class BinaryOperator extends BaseSimpleNode {
             return createExpression(leftExp, rightExp, PredicateBuilder.isEqualTo(leftExp, rightExp));
         } else if (operator == BinaryOperatorType.GT) {
             return createExpression(leftExp, rightExp, PredicateBuilder.isGreaterThan(leftExp, rightExp));
+        } else if (operator == BinaryOperatorType.GTE) {
+            return createExpression(leftExp, rightExp, PredicateBuilder.isGreaterThanOrEqualTo(leftExp, rightExp));
+        } else if (operator == BinaryOperatorType.LT) {
+            return createExpression(leftExp, rightExp, PredicateBuilder.isLessThan(leftExp, rightExp));
+        } else if (operator == BinaryOperatorType.LTE) {
+            return createExpression(leftExp, rightExp, PredicateBuilder.isLessThanOrEqualTo(leftExp, rightExp));
+        } else if (operator == BinaryOperatorType.NOT_EQ) {
+            return createExpression(leftExp, rightExp, PredicateBuilder.isNotEqualTo(leftExp, rightExp));
         } else if (operator == BinaryOperatorType.IS || operator == BinaryOperatorType.NOT_IS) {
             return createIsExpression(expression, leftExp, rightExp);
         }

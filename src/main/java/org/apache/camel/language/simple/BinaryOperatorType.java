@@ -21,7 +21,7 @@ package org.apache.camel.language.simple;
  */
 public enum BinaryOperatorType {
 
-    EQ, GT, GTE, LT, LTE, NOT, CONTAINS, NOT_CONTAINS, REGEX, NOT_REGEX,
+    EQ, GT, GTE, LT, LTE, NOT_EQ, CONTAINS, NOT_CONTAINS, REGEX, NOT_REGEX,
     IN, NOT_IN, IS, NOT_IS, RANGE, NOT_RANGE, AND, OR;
 
     public static BinaryOperatorType asOperator(String text) {
@@ -36,7 +36,7 @@ public enum BinaryOperatorType {
         } else if ("<=".equals(text)) {
             return LTE;
         } else if ("!=".equals(text)) {
-            return NOT;
+            return NOT_EQ;
         } else if ("contains".equals(text)) {
             return CONTAINS;
         } else if ("not contains".equals(text)) {
@@ -76,7 +76,7 @@ public enum BinaryOperatorType {
             return "<";
         } else if (operator == LTE) {
             return "<=";
-        } else if (operator == NOT) {
+        } else if (operator == NOT_EQ) {
             return "!=";
         } else if (operator == CONTAINS) {
             return "contains";
