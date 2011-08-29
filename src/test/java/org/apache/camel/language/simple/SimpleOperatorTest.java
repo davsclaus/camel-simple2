@@ -345,12 +345,10 @@ public class SimpleOperatorTest extends LanguageTestSupport {
         // string to string
         assertPredicate("${in.header.foo} in 'foo,abc,def'", true);
         assertPredicate("${in.header.foo} in ${bean:generator.generateFilename}", true);
-        assertPredicate("${in.header.foo} in foo,abc,def", true);
         assertPredicate("${in.header.foo} in 'foo,def'", false);
 
         // integer to string
         assertPredicate("${in.header.bar} in '100,123,200'", true);
-        assertPredicate("${in.header.bar} in 100,123,200", true);
         assertPredicate("${in.header.bar} in ${bean:generator.generateId}", true);
         assertPredicate("${in.header.bar} in '100,200'", false);
     }
@@ -360,12 +358,10 @@ public class SimpleOperatorTest extends LanguageTestSupport {
         // string to string
         assertPredicate("${in.header.foo} not in 'foo,abc,def'", false);
         assertPredicate("${in.header.foo} not in ${bean:generator.generateFilename}", false);
-        assertPredicate("${in.header.foo} not in foo,abc,def", false);
         assertPredicate("${in.header.foo} not in 'foo,def'", true);
 
         // integer to string
         assertPredicate("${in.header.bar} not in '100,123,200'", false);
-        assertPredicate("${in.header.bar} not in 100,123,200", false);
         assertPredicate("${in.header.bar} not in ${bean:generator.generateId}", false);
         assertPredicate("${in.header.bar} not in '100,200'", true);
     }

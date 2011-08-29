@@ -51,6 +51,8 @@ public class SimpleTokenizer {
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "contains"));
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "not regex"));
         knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "regex"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "not in"));
+        knownTokens.add(new SimpleTokenType(TokenType.binaryOperator, "in"));
 
         // unary operators
         knownTokens.add(new SimpleTokenType(TokenType.unaryOperator, "++"));

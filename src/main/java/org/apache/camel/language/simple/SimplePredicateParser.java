@@ -108,8 +108,10 @@ public class SimplePredicateParser extends BaseSimpleParser {
         // which need to be balanced and have matching start/end pairs
         SimpleNode lastSingle = null;
         SimpleNode lastDouble = null;
+        SimpleNode lastFunction = null;
         AtomicBoolean startSingle = new AtomicBoolean(true);
         AtomicBoolean startDouble = new AtomicBoolean(true);
+        AtomicBoolean startFunction = new AtomicBoolean(false);
 
         LiteralNode imageToken = null;
         for (SimpleToken token : tokens) {
@@ -119,13 +121,15 @@ public class SimplePredicateParser extends BaseSimpleParser {
             }
 
             // create a node from the token
-            SimpleNode node = createNode(token, startSingle, startDouble);
+            SimpleNode node = createNode(token, startSingle, startDouble, startFunction);
             if (node != null) {
                 // keep state of last single/double
                 if (node instanceof SingleQuoteStart) {
                     lastSingle = node;
                 } else if (node instanceof DoubleQuoteStart) {
                     lastDouble = node;
+                } else if (node instanceof FunctionStart) {
+                    lastFunction = node;
                 }
 
                 // a new token was created so the current image token need to be added first
@@ -152,7 +156,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
             nodes.add(imageToken);
         }
 
-        // validate the single and double quote pairs is in balance
+        // validate the single, double quote pairs and functions is in balance
         if (!startSingle.get()) {
             int index = lastSingle != null ? lastSingle.getToken().getIndex() : 0;
             throw new SimpleParserException("single quote has no ending quote", index);
@@ -161,13 +165,26 @@ public class SimplePredicateParser extends BaseSimpleParser {
             int index = lastDouble != null ? lastDouble.getToken().getIndex() : 0;
             throw new SimpleParserException("double quote has no ending quote", index);
         }
+        if (startFunction.get()) {
+            // we have a start function, but no ending function
+            int index = lastFunction != null ? lastFunction.getToken().getIndex() : 0;
+            throw new SimpleParserException("function has no ending symbol", index);
+        }
     }
 
-    private SimpleNode createNode(SimpleToken token, AtomicBoolean startSingle, AtomicBoolean startDouble) {
+    private SimpleNode createNode(SimpleToken token, AtomicBoolean startSingle, AtomicBoolean startDouble, AtomicBoolean startFunction) {
         if (token.getType().isFunctionStart()) {
+            startFunction.set(true);
             return new FunctionStart(token);
         } else if (token.getType().isFunctionEnd()) {
+            startFunction.set(false);
             return new FunctionEnd(token);
+        }
+
+        // if we are inside a function, then we do not support any other kind of tokens
+        // as we want all the tokens to be literal instead
+        if (startFunction.get()) {
+            return null;
         }
 
         // for predicates we support quotes and operators (eg binary is predicates)

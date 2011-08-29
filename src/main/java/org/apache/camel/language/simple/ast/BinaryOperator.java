@@ -16,10 +16,15 @@
  */
 package org.apache.camel.language.simple.ast;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.PredicateBuilder;
+import org.apache.camel.builder.ValueBuilder;
 import org.apache.camel.language.simple.BinaryOperatorType;
 import org.apache.camel.language.simple.SimpleIllegalSyntaxException;
 import org.apache.camel.language.simple.SimpleParserException;
@@ -83,6 +88,8 @@ public class BinaryOperator extends BaseSimpleNode {
             return createIsExpression(expression, leftExp, rightExp);
         } else if (operator == BinaryOperatorType.REGEX || operator == BinaryOperatorType.NOT_REGEX) {
             return createRegexExpression(leftExp, rightExp);
+        } else if (operator == BinaryOperatorType.IN || operator == BinaryOperatorType.NOT_IN) {
+            return createInExpression(leftExp, rightExp);
         }
 
         throw new SimpleParserException("Unknown binary operator " + operator, symbol.getIndex());
@@ -125,6 +132,35 @@ public class BinaryOperator extends BaseSimpleNode {
                 // reg ex should use String pattern, so we evaluate the right hand side as a String
                 Predicate predicate = PredicateBuilder.regex(leftExp, rightExp.evaluate(exchange, String.class));
                 if (operator == BinaryOperatorType.NOT_REGEX) {
+                    predicate = PredicateBuilder.not(predicate);
+                }
+                boolean answer = predicate.matches(exchange);
+                return exchange.getContext().getTypeConverter().convertTo(type, answer);
+            }
+
+            @Override
+            public String toString() {
+                return left + " " + symbol.getText() + " " + right;
+            }
+        };
+    }
+
+    private Expression createInExpression(final Expression leftExp, final Expression rightExp) {
+        return new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                // okay the in operator is a bit more complex as we need to build a list of values
+                // from the right hand side expression.
+                // each element on the right hand side must be separated by comma (default for create iterator)
+                Iterator<Object> it = ObjectHelper.createIterator(rightExp.evaluate(exchange, Object.class));
+                List<Object> values = new ArrayList<Object>();
+                while (it.hasNext()) {
+                    values.add(it.next());
+                }
+                // then reuse value builder to create the in predicate with the list of values
+                ValueBuilder vb = new ValueBuilder(leftExp);
+                Predicate predicate = vb.in(values.toArray());
+                if (operator == BinaryOperatorType.NOT_IN) {
                     predicate = PredicateBuilder.not(predicate);
                 }
                 boolean answer = predicate.matches(exchange);
