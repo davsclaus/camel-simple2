@@ -26,8 +26,8 @@ public class FunctionStart extends BaseSimpleNode implements BlockStart {
 
     private LiteralNode literal;
 
-    public FunctionStart(SimpleToken symbol) {
-        super(symbol);
+    public FunctionStart(SimpleToken token) {
+        super(token);
     }
 
     @Override

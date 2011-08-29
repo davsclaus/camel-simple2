@@ -24,9 +24,13 @@ import org.apache.camel.language.simple.ast.Block;
 import org.apache.camel.language.simple.ast.BlockEnd;
 import org.apache.camel.language.simple.ast.BlockStart;
 import org.apache.camel.language.simple.ast.SimpleNode;
+import org.apache.camel.language.simple.ast.UnaryOperator;
 
 /**
  * Base class for Simple language parser.
+ * <p/>
+ * This parser is based on the principles of a
+ * <a href="http://en.wikipedia.org/wiki/Recursive_descent_parser">recursive descent parser</a>.
  */
 public abstract class BaseSimpleParser {
 
@@ -69,7 +73,7 @@ public abstract class BaseSimpleParser {
     /**
      * Stacks the blocks.
      * <p/>
-     * This operator is needed after the initial parsing of the input according to the grammar.
+     * This method is needed after the initial parsing of the input according to the grammar.
      */
     protected void stackBlocks() {
         List<SimpleNode> answer = new ArrayList<SimpleNode>();
@@ -100,6 +104,31 @@ public abstract class BaseSimpleParser {
         // replace tokens from the stack
         nodes.clear();
         nodes.addAll(answer);
+    }
+
+    /**
+     * Stacks the unary operators
+     * <p/>
+     * This method is needed after the initial parsing of the input according to the grammar.
+     */
+    protected void stackUnaryOperators() {
+        Stack<SimpleNode> stack = new Stack<SimpleNode>();
+
+        for (SimpleNode node : nodes) {
+            if (node instanceof UnaryOperator) {
+                UnaryOperator unary = (UnaryOperator) node;
+                SimpleNode previous = stack.isEmpty() ? null : stack.pop();
+                if (previous == null) {
+                    throw new SimpleParserException("no preceding token to use with unary operator", unary.getToken().getIndex());
+                } else {
+                    unary.acceptLeft(previous);
+                }
+            }
+            stack.push(node);
+        }
+
+        nodes.clear();
+        nodes.addAll(stack);
     }
 
     // --------------------------------------------------------------
@@ -156,5 +185,4 @@ public abstract class BaseSimpleParser {
             nextToken();
         }
     }
-
 }

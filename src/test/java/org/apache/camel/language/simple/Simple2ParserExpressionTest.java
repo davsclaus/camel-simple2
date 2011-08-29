@@ -81,14 +81,6 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2FunctionUnary() throws Exception {
-        exchange.getIn().setBody("123");
-        SimpleExpressionParser parser = new SimpleExpressionParser("${body}++");
-        Expression exp = parser.parseExpression();
-
-        assertEquals("123++", exp.evaluate(exchange, String.class));
-    }
-
     public void testSimple2SingleQuoteWithEscape() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("Pay 200\\$ today");
         Expression exp = parser.parseExpression();
@@ -112,6 +104,22 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
             // expected
             System.out.println(e.getMessage());
         }
+    }
+
+    public void testSimple2UnaryInc() throws Exception {
+        exchange.getIn().setBody("122");
+        SimpleExpressionParser parser = new SimpleExpressionParser("${body}++");
+        Expression exp = parser.parseExpression();
+
+        assertEquals("123", exp.evaluate(exchange, String.class));
+    }
+
+    public void testSimple2UnaryDec() throws Exception {
+        exchange.getIn().setBody("122");
+        SimpleExpressionParser parser = new SimpleExpressionParser("${body}--");
+        Expression exp = parser.parseExpression();
+
+        assertEquals("121", exp.evaluate(exchange, String.class));
     }
 
 }

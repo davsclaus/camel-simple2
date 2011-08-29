@@ -24,8 +24,8 @@ import org.apache.camel.language.simple.SimpleToken;
  */
 public class FunctionEnd extends BaseSimpleNode implements BlockEnd {
 
-    public FunctionEnd(SimpleToken symbol) {
-        super(symbol);
+    public FunctionEnd(SimpleToken token) {
+        super(token);
     }
 
     @Override

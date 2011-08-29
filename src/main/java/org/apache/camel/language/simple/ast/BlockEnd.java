@@ -17,7 +17,7 @@
 package org.apache.camel.language.simple.ast;
 
 /**
- *
+ * Marks an end of a block.
  */
 public interface BlockEnd {
 }

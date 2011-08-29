@@ -24,8 +24,8 @@ import org.apache.camel.language.simple.SimpleToken;
  */
 public class DoubleQuoteEnd extends BaseSimpleNode implements BlockEnd {
 
-    public DoubleQuoteEnd(SimpleToken symbol) {
-        super(symbol);
+    public DoubleQuoteEnd(SimpleToken token) {
+        super(token);
     }
 
     @Override

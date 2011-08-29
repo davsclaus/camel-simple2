@@ -53,7 +53,7 @@ public class BinaryOperator extends BaseSimpleNode {
 
     @Override
     public String toString() {
-        return left + " " + symbol.getText() + " " + right;
+        return left + " " + token.getText() + " " + right;
     }
 
     public boolean acceptLeftNode(SimpleNode lef) {
@@ -100,7 +100,7 @@ public class BinaryOperator extends BaseSimpleNode {
             return createRangeExpression(expression, leftExp, rightExp);
         }
 
-        throw new SimpleParserException("Unknown binary operator " + operator, symbol.getIndex());
+        throw new SimpleParserException("Unknown binary operator " + operator, token.getIndex());
     }
 
     private Expression createIsExpression(final String expression, final Expression leftExp, final Expression rightExp) {
@@ -128,7 +128,7 @@ public class BinaryOperator extends BaseSimpleNode {
 
             @Override
             public String toString() {
-                return left + " " + symbol.getText() + " " + right;
+                return left + " " + token.getText() + " " + right;
             }
         };
     }
@@ -148,7 +148,7 @@ public class BinaryOperator extends BaseSimpleNode {
 
             @Override
             public String toString() {
-                return left + " " + symbol.getText() + " " + right;
+                return left + " " + token.getText() + " " + right;
             }
         };
     }
@@ -177,7 +177,7 @@ public class BinaryOperator extends BaseSimpleNode {
 
             @Override
             public String toString() {
-                return left + " " + symbol.getText() + " " + right;
+                return left + " " + token.getText() + " " + right;
             }
         };
     }
@@ -211,7 +211,7 @@ public class BinaryOperator extends BaseSimpleNode {
 
             @Override
             public String toString() {
-                return left + " " + symbol.getText() + " " + right;
+                return left + " " + token.getText() + " " + right;
             }
         };
     }
@@ -226,7 +226,7 @@ public class BinaryOperator extends BaseSimpleNode {
 
             @Override
             public String toString() {
-                return left + " " + symbol.getText() + " " + right;
+                return left + " " + token.getText() + " " + right;
             }
         };
     }

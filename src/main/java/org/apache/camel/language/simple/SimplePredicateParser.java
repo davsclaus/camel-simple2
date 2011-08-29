@@ -247,27 +247,6 @@ public class SimplePredicateParser extends BaseSimpleParser {
         }
     }
 
-    private void stackUnaryOperators() {
-        Stack<SimpleNode> stack = new Stack<SimpleNode>();
-
-        for (SimpleNode node : nodes) {
-            if (node instanceof UnaryOperator) {
-                UnaryOperator unary = (UnaryOperator) node;
-                SimpleNode previous = stack.isEmpty() ? null : stack.pop();
-                if (previous == null) {
-                    throw new SimpleParserException("no preceding token to use with unary operator", unary.getToken().getIndex());
-                } else {
-                    unary.acceptLeft(previous);
-                }
-            }
-            stack.push(node);
-        }
-
-        nodes.clear();
-        nodes.addAll(stack);
-    }
-
-
     private void stackBinaryOperators() {
         Stack<SimpleNode> stack = new Stack<SimpleNode>();
 
@@ -327,6 +306,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
     // - function = simple functions such as ${body} etc
     // - numeric = numeric value
     // - boolean = boolean value
+    // - null = null value
     // - unary operator = operator attached to the left hand side node
     // - binary operator = operator attached to both the left and right hand side nodes
 

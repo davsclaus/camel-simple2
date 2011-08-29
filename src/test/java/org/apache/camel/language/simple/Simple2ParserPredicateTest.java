@@ -70,6 +70,24 @@ public class Simple2ParserPredicateTest extends ExchangeTestSupport {
         assertTrue("Should match", pre.matches(exchange));
     }
 
+    public void testSimple2UnaryInc() throws Exception {
+        exchange.getIn().setBody(122);
+
+        SimplePredicateParser parser = new SimplePredicateParser("${body}++ == 123");
+        Predicate pre = parser.parsePredicate();
+
+        assertTrue("Should match", pre.matches(exchange));
+    }
+
+    public void testSimple2UnaryDec() throws Exception {
+        exchange.getIn().setBody(122);
+
+        SimplePredicateParser parser = new SimplePredicateParser("${body}-- == 121");
+        Predicate pre = parser.parsePredicate();
+
+        assertTrue("Should match", pre.matches(exchange));
+    }
+
     public void testSimple2EqFunctionBoolean() throws Exception {
         exchange.getIn().setBody("Hello");
         exchange.getIn().setHeader("high", true);

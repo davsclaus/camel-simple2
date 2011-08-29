@@ -16,7 +16,10 @@
  */
 package org.apache.camel.language.simple.ast;
 
+import org.apache.camel.CamelExchangeException;
+import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
+import org.apache.camel.language.simple.SimpleParserException;
 import org.apache.camel.language.simple.SimpleToken;
 import org.apache.camel.language.simple.UnaryOperatorType;
 import org.apache.camel.util.ObjectHelper;
@@ -27,18 +30,19 @@ import org.apache.camel.util.ObjectHelper;
 public class UnaryOperator extends BaseSimpleNode {
 
     private UnaryOperatorType operator;
-    private SimpleNode node;
+    private SimpleNode left;
 
-    public UnaryOperator(SimpleToken symbol) {
-        super(symbol);
+    public UnaryOperator(SimpleToken token) {
+        super(token);
+        operator = UnaryOperatorType.asOperator(token.getText());
     }
 
     @Override
     public String toString() {
-        if (node != null) {
-            return node + symbol.getText();
+        if (left != null) {
+            return left + token.getText();
         } else {
-            return symbol.getText();
+            return token.getText();
         }
     }
 
@@ -48,12 +52,66 @@ public class UnaryOperator extends BaseSimpleNode {
      * @param left  the left node to accept
      */
     public void acceptLeft(SimpleNode left) {
-        this.node = left;
+        this.left = left;
     }
 
     @Override
     public Expression createExpression(String expression) {
-        ObjectHelper.notNull(node, "left node", this);
-        return null;
+        ObjectHelper.notNull(left, "left node", this);
+
+        final Expression leftExp = left.createExpression(expression);
+
+        if (operator == UnaryOperatorType.INC) {
+            return createIncExpression(leftExp);
+        } else if (operator == UnaryOperatorType.DEC) {
+            return createDecExpression(leftExp);
+        }
+
+        throw new SimpleParserException("Unknown unary operator " + operator, token.getIndex());
     }
+
+    private Expression createIncExpression(final Expression leftExp) {
+        return new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                Number num = leftExp.evaluate(exchange, Number.class);
+                if (num != null) {
+                    long val = num.longValue();
+                    val++;
+                    return exchange.getContext().getTypeConverter().convertTo(type, val);
+                }
+                // cannot convert the expression as a number
+                Exception cause = new CamelExchangeException("Cannot evaluate " + leftExp + " as a number", exchange);
+                throw ObjectHelper.wrapRuntimeCamelException(cause);
+            }
+
+            @Override
+            public String toString() {
+                return left + operator.toString();
+            }
+        };
+    }
+
+    private Expression createDecExpression(final Expression leftExp) {
+        return new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                Number num = leftExp.evaluate(exchange, Number.class);
+                if (num != null) {
+                    long val = num.longValue();
+                    val--;
+                    return exchange.getContext().getTypeConverter().convertTo(type, val);
+                }
+                // cannot convert the expression as a number
+                Exception cause = new CamelExchangeException("Cannot evaluate " + leftExp + " as a number", exchange);
+                throw ObjectHelper.wrapRuntimeCamelException(cause);
+            }
+
+            @Override
+            public String toString() {
+                return left + operator.toString();
+            }
+        };
+    }
+
 }

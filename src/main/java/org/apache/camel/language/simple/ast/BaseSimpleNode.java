@@ -23,13 +23,13 @@ import org.apache.camel.language.simple.SimpleToken;
  */
 public abstract class BaseSimpleNode implements SimpleNode {
 
-    protected final SimpleToken symbol;
+    protected final SimpleToken token;
 
-    protected BaseSimpleNode(SimpleToken symbol) {
-        this.symbol = symbol;
+    protected BaseSimpleNode(SimpleToken token) {
+        this.token = token;
     }
 
     public SimpleToken getToken() {
-        return symbol;
+        return token;
     }
 }

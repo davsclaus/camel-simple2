@@ -27,8 +27,8 @@ public class Literal extends BaseSimpleNode implements LiteralNode {
 
     protected StringBuilder text = new StringBuilder();
 
-    public Literal(SimpleToken symbol) {
-        super(symbol);
+    public Literal(SimpleToken token) {
+        super(token);
     }
 
     @Override

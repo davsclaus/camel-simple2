@@ -26,9 +26,9 @@ public class DoubleQuoteStart extends BaseSimpleNode implements BlockStart {
 
     private final CompositeNodes block;
 
-    public DoubleQuoteStart(SimpleToken symbol) {
-        super(symbol);
-        this.block = new CompositeNodes(symbol);
+    public DoubleQuoteStart(SimpleToken token) {
+        super(token);
+        this.block = new CompositeNodes(token);
     }
 
     @Override

@@ -30,8 +30,8 @@ public class CompositeNodes extends BaseSimpleNode {
 
     private final List<SimpleNode> children = new ArrayList<SimpleNode>();
 
-    public CompositeNodes(SimpleToken symbol) {
-        super(symbol);
+    public CompositeNodes(SimpleToken token) {
+        super(token);
     }
 
     @Override

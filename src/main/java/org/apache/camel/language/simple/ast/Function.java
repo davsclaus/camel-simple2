@@ -30,8 +30,8 @@ import org.apache.camel.util.StringHelper;
  */
 public class Function extends Literal {
 
-    public Function(SimpleToken symbol) {
-        super(symbol);
+    public Function(SimpleToken token) {
+        super(token);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Function extends Literal {
         if (remainder != null) {
             String type = ObjectHelper.between(remainder, "(", ")");
             if (type == null) {
-                throw new SimpleParserException("Valid syntax: ${bodyAs(type)} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${bodyAs(type)} was: " + function, token.getIndex());
             }
             type = StringHelper.removeQuotes(type);
             return ExpressionBuilder.bodyExpression(type);
@@ -62,7 +62,7 @@ public class Function extends Literal {
         if (remainder != null) {
             String type = ObjectHelper.between(remainder, "(", ")");
             if (type == null) {
-                throw new SimpleParserException("Valid syntax: ${mandatoryBodyAs(type)} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${mandatoryBodyAs(type)} was: " + function, token.getIndex());
             }
             type = StringHelper.removeQuotes(type);
             return ExpressionBuilder.mandatoryBodyExpression(type);
@@ -76,7 +76,7 @@ public class Function extends Literal {
         if (remainder != null) {
             boolean invalid = OgnlHelper.isInvalidValidOgnlExpression(remainder);
             if (invalid) {
-                throw new SimpleParserException("Valid syntax: ${body.OGNL} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${body.OGNL} was: " + function, token.getIndex());
             }
             return ExpressionBuilder.bodyOgnlExpression(remainder);
         }
@@ -86,7 +86,7 @@ public class Function extends Literal {
         if (remainder != null) {
             boolean invalid = OgnlHelper.isInvalidValidOgnlExpression(remainder);
             if (invalid) {
-                throw new SimpleParserException("Valid syntax: ${exception.OGNL} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${exception.OGNL} was: " + function, token.getIndex());
             }
             return ExpressionBuilder.exchangeExceptionOgnlExpression(remainder);
         }
@@ -96,13 +96,13 @@ public class Function extends Literal {
         if (remainder != null) {
             String keyAndType = ObjectHelper.between(remainder, "(", ")");
             if (keyAndType == null) {
-                throw new SimpleParserException("Valid syntax: ${headerAs(key, type)} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${headerAs(key, type)} was: " + function, token.getIndex());
             }
 
             String key = ObjectHelper.before(keyAndType, ",");
             String type = ObjectHelper.after(keyAndType, ",");
             if (ObjectHelper.isEmpty(key) || ObjectHelper.isEmpty(type)) {
-                throw new SimpleParserException("Valid syntax: ${headerAs(key, type)} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${headerAs(key, type)} was: " + function, token.getIndex());
             }
             key = StringHelper.removeQuotes(key);
             type = StringHelper.removeQuotes(type);
@@ -132,7 +132,7 @@ public class Function extends Literal {
             // validate syntax
             boolean invalid = OgnlHelper.isInvalidValidOgnlExpression(remainder);
             if (invalid) {
-                throw new SimpleParserException("Valid syntax: ${header.name[key]} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${header.name[key]} was: " + function, token.getIndex());
             }
 
             if (OgnlHelper.isValidOgnlExpression(remainder)) {
@@ -162,7 +162,7 @@ public class Function extends Literal {
             // validate syntax
             boolean invalid = OgnlHelper.isInvalidValidOgnlExpression(remainder);
             if (invalid) {
-                throw new SimpleParserException("Valid syntax: ${property.OGNL} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${property.OGNL} was: " + function, token.getIndex());
             }
 
             if (OgnlHelper.isValidOgnlExpression(remainder)) {
@@ -200,7 +200,7 @@ public class Function extends Literal {
         if (remainder != null) {
             String[] parts = remainder.split(":");
             if (parts.length < 2) {
-                throw new SimpleParserException("Valid syntax: ${date:command:pattern} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${date:command:pattern} was: " + function, token.getIndex());
             }
             String command = ObjectHelper.before(remainder, ":");
             String pattern = ObjectHelper.after(remainder, ":");
@@ -218,7 +218,7 @@ public class Function extends Literal {
         if (remainder != null) {
             String[] parts = remainder.split(":");
             if (parts.length > 2) {
-                throw new SimpleParserException("Valid syntax: ${properties:[locations]:key} was: " + function, symbol.getIndex());
+                throw new SimpleParserException("Valid syntax: ${properties:[locations]:key} was: " + function, token.getIndex());
             }
 
             String locations = null;
@@ -236,7 +236,7 @@ public class Function extends Literal {
             return ExpressionBuilder.refExpression(remainder);
         }
 
-        throw new SimpleParserException("Unknown function: " + function, symbol.getIndex());
+        throw new SimpleParserException("Unknown function: " + function, token.getIndex());
     }
 
     private Expression createSimpleExpressionDirectly(String expression) {
@@ -287,7 +287,7 @@ public class Function extends Literal {
         } else if (ObjectHelper.equal(remainder, "modified")) {
             return ExpressionBuilder.fileLastModifiedExpression();
         }
-        throw new SimpleParserException("Unknown file language syntax: " + remainder, symbol.getIndex());
+        throw new SimpleParserException("Unknown file language syntax: " + remainder, token.getIndex());
     }
 
     private String ifStartsWithReturnRemainder(String prefix, String text) {

@@ -26,8 +26,8 @@ import org.apache.camel.language.simple.SimpleToken;
  */
 public class NullNode extends BaseSimpleNode {
 
-    public NullNode(SimpleToken symbol) {
-        super(symbol);
+    public NullNode(SimpleToken token) {
+        super(token);
     }
 
     @Override

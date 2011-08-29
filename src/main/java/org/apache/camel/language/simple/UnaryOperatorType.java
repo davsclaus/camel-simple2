@@ -21,6 +21,29 @@ package org.apache.camel.language.simple;
  */
 public enum UnaryOperatorType {
 
-    INC;
+    INC, DEC;
+
+    public static UnaryOperatorType asOperator(String text) {
+        if ("++".equals(text)) {
+            return INC;
+        } else if ("--".equals(text)) {
+            return DEC;
+        }
+        throw new IllegalArgumentException("Operator not supported: " + text);
+    }
+
+    public String getOperatorText(UnaryOperatorType operator) {
+        if (operator == INC) {
+            return "++";
+        } else if (operator == DEC) {
+            return "--";
+        }
+        return "";
+    }
+
+    @Override
+    public String toString() {
+        return getOperatorText(this);
+    }
 
 }

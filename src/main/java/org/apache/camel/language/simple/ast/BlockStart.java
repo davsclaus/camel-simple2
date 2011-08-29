@@ -17,7 +17,7 @@
 package org.apache.camel.language.simple.ast;
 
 /**
- *
+ * Marks a start of a block.
  */
 public interface BlockStart extends Block {
 }

@@ -18,6 +18,7 @@ package org.apache.camel.language.simple;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.apache.camel.Expression;
 import org.apache.camel.builder.ExpressionBuilder;
@@ -26,6 +27,7 @@ import org.apache.camel.language.simple.ast.FunctionStart;
 import org.apache.camel.language.simple.ast.Literal;
 import org.apache.camel.language.simple.ast.LiteralNode;
 import org.apache.camel.language.simple.ast.SimpleNode;
+import org.apache.camel.language.simple.ast.UnaryOperator;
 
 /**
  * A parser to parse simple language as a Camel {@link Expression}
@@ -67,6 +69,8 @@ public class SimpleExpressionParser extends BaseSimpleParser {
         parseAndCreateAstModel();
         // compact and stack blocks (eg function start/end)
         stackBlocks();
+        // compact and stack unary operators
+        stackUnaryOperators();
 
         // create and return as a Camel expression
         List<Expression> expressions = createExpressions();
@@ -119,11 +123,13 @@ public class SimpleExpressionParser extends BaseSimpleParser {
     }
 
     private SimpleNode createNode(SimpleToken token) {
-        // expression only support functions
+        // expression only support functions and unary operators
         if (token.getType().isFunctionStart()) {
             return new FunctionStart(token);
         } else if (token.getType().isFunctionEnd()) {
             return new FunctionEnd(token);
+        } else if (token.getType().isUnary()) {
+            return new UnaryOperator(token);
         }
 
         // by returning null, we will let the parser determine what to do
@@ -148,6 +154,7 @@ public class SimpleExpressionParser extends BaseSimpleParser {
     // the expression parser only understands
     // - template = literal texts with can contain embedded functions
     // - function = simple functions such as ${body} etc
+    // - unary operator = operator attached to the left hand side node
 
     protected void templateText() {
         // for template we accept anything but functions
