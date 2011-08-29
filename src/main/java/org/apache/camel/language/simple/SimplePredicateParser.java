@@ -71,7 +71,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
                     && !token.getType().isWhitespace() && !token.getType().isEol()) {
                 // okay the symbol was not one of the above, so its not supported
                 // use the previous index as that is where the problem is
-                throw new SimpleParserException("unexpected " + token.getType().getType() + " symbol", previousIndex);
+                throw new SimpleParserException("unexpected " + token.getType().getType() + " token", previousIndex);
             }
             nextToken();
         }
@@ -171,7 +171,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
         if (startFunction.get()) {
             // we have a start function, but no ending function
             int index = lastFunction != null ? lastFunction.getToken().getIndex() : 0;
-            throw new SimpleParserException("function has no ending symbol", index);
+            throw new SimpleParserException("function has no ending token", index);
         }
     }
 
@@ -365,6 +365,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
     // - null = null value
     // - unary operator = operator attached to the left hand side node
     // - binary operator = operator attached to both the left and right hand side nodes
+    // - logical operator = operator attached to both the left and right hand side nodes
 
     protected boolean singleQuotedText() {
         if (accept(TokenType.singleQuote)) {

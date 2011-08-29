@@ -55,9 +55,10 @@ public class SimpleExpressionParser extends BaseSimpleParser {
         // parse the expression using the following grammar
         nextToken();
         while (!token.getType().isEol()) {
-            // an expression supports just template (eg text) and functions
+            // an expression supports just template (eg text), functions, or unary operator
             templateText();
             functionText();
+            unaryOperator();
             nextToken();
         }
 
@@ -176,4 +177,13 @@ public class SimpleExpressionParser extends BaseSimpleParser {
         return false;
     }
 
+    protected boolean unaryOperator() {
+        if (accept(TokenType.unaryOperator)) {
+            nextToken();
+            // there should be a whitespace after the operator
+            expect(TokenType.whiteSpace);
+            return true;
+        }
+        return false;
+    }
 }

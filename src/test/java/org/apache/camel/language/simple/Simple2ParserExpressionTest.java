@@ -75,9 +75,8 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         try {
             parser.parseExpression();
             fail("Should thrown exception");
-        } catch (ExpressionIllegalSyntaxException e) {
-            // expected
-            System.out.println(e.getMessage());
+        } catch (SimpleIllegalSyntaxException e) {
+            assertEquals(6, e.getIndex());
         }
     }
 
@@ -100,9 +99,8 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         try {
             parser.parseExpression();
             fail("Should thrown exception");
-        } catch (ExpressionIllegalSyntaxException e) {
-            // expected
-            System.out.println(e.getMessage());
+        } catch (SimpleIllegalSyntaxException e) {
+            assertEquals(19, e.getIndex());
         }
     }
 

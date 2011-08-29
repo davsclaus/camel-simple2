@@ -77,7 +77,7 @@ public class SimpleTokenizer {
         if (expression.charAt(index) == '\\' && index < expression.length() - 1) {
             String text = "" + expression.charAt(index + 1);
             // use 2 as length for escaped as we need to jump to the next symbol
-            return new SimpleToken(new SimpleTokenType(TokenType.escaped, text), index, 2);
+            return new SimpleToken(new SimpleTokenType(TokenType.escapedValue, text), index, 2);
         }
 
         // is it a numeric value
@@ -95,7 +95,7 @@ public class SimpleTokenizer {
             return new SimpleToken(new SimpleTokenType(TokenType.numericValue, sb.toString()), index);
         }
 
-        // it could be any of the known symbols
+        // it could be any of the known tokens
         String text = expression.substring(index);
         for (SimpleTokenType token : knownTokens) {
             if (text.startsWith(token.getValue())) {
@@ -103,6 +103,7 @@ public class SimpleTokenizer {
             }
 
         }
+
         // fallback and create a character token
         char ch = expression.charAt(index);
         SimpleToken token = new SimpleToken(new SimpleTokenType(TokenType.character, "" + ch), index);
