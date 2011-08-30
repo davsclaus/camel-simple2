@@ -48,6 +48,14 @@ public class SimpleTest extends LanguageTestSupport {
         return jndi;
     }
 
+    @Override
+    protected void populateExchange(Exchange exchange) {
+        super.populateExchange(exchange);
+
+        // the LanguageTestSupport is camel-core sets this property
+        exchange.setProperty("foobar", "cba");
+    }
+
     @Test
     public void testResultType() throws Exception {
         assertEquals(123, SimpleLanguage.simple("${header.bar}", int.class).evaluate(exchange, Object.class));
@@ -262,7 +270,7 @@ public class SimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (SimpleIllegalSyntaxException e) {
             assertEquals(0, e.getIndex());
-            assertTrue(e.getMessage().startsWith("Illegal syntax: Valid syntax: ${property.OGNL} was: property.foobar[bar"));
+            assertTrue(e.getMessage().startsWith("Valid syntax: ${property.OGNL} was: property.foobar[bar"));
         }
     }
 
