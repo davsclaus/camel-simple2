@@ -29,19 +29,22 @@ public class SimpleTokenType {
         this.value = value;
     }
 
+    /**
+     * Gets the type of this token
+     *
+     * @return the type
+     */
     public TokenType getType() {
         return type;
     }
 
+    /**
+     * Gets the input value in this token
+     *
+     * @return the value
+     */
     public String getValue() {
         return value;
-    }
-
-    /**
-     * Whether the type is a literal value (not whitespace)
-     */
-    public boolean isLiteral() {
-        return type == TokenType.character || type == TokenType.booleanValue || type == TokenType.numericValue;
     }
 
     /**

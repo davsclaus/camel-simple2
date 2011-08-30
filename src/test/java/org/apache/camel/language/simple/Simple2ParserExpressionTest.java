@@ -70,16 +70,6 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         assertEquals("World", exp.evaluate(exchange, String.class));
    }
 
-    public void testSimple2FunctionInvalid() throws Exception {
-        SimpleExpressionParser parser = new SimpleExpressionParser("${body${foo}}");
-        try {
-            parser.parseExpression();
-            fail("Should thrown exception");
-        } catch (SimpleIllegalSyntaxException e) {
-            assertEquals(6, e.getIndex());
-        }
-    }
-
     public void testSimple2SingleQuoteWithEscape() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("Pay 200\\$ today");
         Expression exp = parser.parseExpression();
@@ -92,16 +82,6 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         Expression exp = parser.parseExpression();
 
         assertEquals("Pay 200$", exp.evaluate(exchange, String.class));
-    }
-
-    public void testSimple2UnbalanceFunction() throws Exception {
-        SimpleExpressionParser parser = new SimpleExpressionParser("${body is a nice day");
-        try {
-            parser.parseExpression();
-            fail("Should thrown exception");
-        } catch (SimpleIllegalSyntaxException e) {
-            assertEquals(19, e.getIndex());
-        }
     }
 
     public void testSimple2UnaryInc() throws Exception {

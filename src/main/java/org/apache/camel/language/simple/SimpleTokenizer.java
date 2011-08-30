@@ -24,6 +24,10 @@ import java.util.List;
  */
 public class SimpleTokenizer {
 
+    // TODO: The known tokens could possible be static for the base line of known tokens
+    // then what we add in the future, is that the ${ } - function start/end can be
+    // configured by the end user.
+
     private final List<SimpleTokenType> knownTokens = new ArrayList<SimpleTokenType>();
 
     public SimpleTokenizer() {

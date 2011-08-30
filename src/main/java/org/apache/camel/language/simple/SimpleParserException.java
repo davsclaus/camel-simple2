@@ -20,7 +20,7 @@ import org.apache.camel.RuntimeCamelException;
 
 /**
  * Holds information about error parsing the simple expression at a given location
- * in the input
+ * in the input.
  */
 public class SimpleParserException extends RuntimeCamelException {
 

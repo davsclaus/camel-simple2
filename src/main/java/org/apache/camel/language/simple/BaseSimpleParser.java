@@ -47,6 +47,10 @@ public abstract class BaseSimpleParser {
         this.tokenizer = new SimpleTokenizer();
     }
 
+    /**
+     * Advances the parser position to the next known {@link SimpleToken}
+     * in the input.
+     */
     protected void nextToken() {
         if (index < expression.length()) {
             SimpleToken next = tokenizer.nextToken(expression, index);
@@ -62,6 +66,9 @@ public abstract class BaseSimpleParser {
         }
     }
 
+    /**
+     * Clears the parser state, which means it can be used for parsing a new input.
+     */
     protected void clear() {
         token = null;
         previousIndex = 0;
@@ -71,11 +78,17 @@ public abstract class BaseSimpleParser {
     }
 
     /**
-     * Stacks the blocks.
+     * Prepares blocks, such as functions, single or double quoted texts.
      * <p/>
-     * This method is needed after the initial parsing of the input according to the grammar.
+     * This process prepares the {@link Block}s in the AST. This is done
+     * by linking child {@link SimpleNode nodes} which are within the start and end of the blocks,
+     * as child to the given block. This is done to have the AST graph updated and prepared properly.
+     * <p/>
+     * So when the AST node is later used to create the {@link org.apache.camel.Predicate}s
+     * to be used by Camel then the AST graph has a linked and prepared
+     * graph of nodes which represent the input expression.
      */
-    protected void stackBlocks() {
+    protected void prepareBlocks() {
         List<SimpleNode> answer = new ArrayList<SimpleNode>();
         Stack<Block> stack = new Stack<Block>();
 
@@ -101,17 +114,23 @@ public abstract class BaseSimpleParser {
             }
         }
 
-        // replace tokens from the stack
+        // replace nodes from the stack
         nodes.clear();
         nodes.addAll(answer);
     }
 
     /**
-     * Stacks the unary operators
+     * Prepares unary operators.
      * <p/>
-     * This method is needed after the initial parsing of the input according to the grammar.
+     * This process prepares the unary operators in the AST. This is done
+     * by linking the unary operator with the left hand side node,
+     * to have the AST graph updated and prepared properly.
+     * <p/>
+     * So when the AST node is later used to create the {@link org.apache.camel.Predicate}s
+     * to be used by Camel then the AST graph has a linked and prepared
+     * graph of nodes which represent the input expression.
      */
-    protected void stackUnaryOperators() {
+    protected void prepareUnaryOperators() {
         Stack<SimpleNode> stack = new Stack<SimpleNode>();
 
         for (SimpleNode node : nodes) {
@@ -127,6 +146,7 @@ public abstract class BaseSimpleParser {
             stack.push(node);
         }
 
+        // replace nodes from the stack
         nodes.clear();
         nodes.addAll(stack);
     }

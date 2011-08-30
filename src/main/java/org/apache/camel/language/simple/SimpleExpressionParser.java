@@ -18,7 +18,6 @@ package org.apache.camel.language.simple;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.camel.Expression;
 import org.apache.camel.builder.ExpressionBuilder;
@@ -69,9 +68,9 @@ public class SimpleExpressionParser extends BaseSimpleParser {
         // turn the tokens into the ast model
         parseAndCreateAstModel();
         // compact and stack blocks (eg function start/end)
-        stackBlocks();
+        prepareBlocks();
         // compact and stack unary operators
-        stackUnaryOperators();
+        prepareUnaryOperators();
 
         // create and return as a Camel expression
         List<Expression> expressions = createExpressions();

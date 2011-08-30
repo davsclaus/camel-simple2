@@ -17,7 +17,7 @@
 package org.apache.camel.language.simple;
 
 /**
- * Holder for a token, with associated type and position in the input
+ * Holder for a token, with associated type and position in the input.
  */
 public final class SimpleToken {
 

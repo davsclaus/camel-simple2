@@ -38,7 +38,7 @@ public class Simple2Language implements Language, IsSingleton {
 
     @Override
     public boolean isSingleton() {
-        // currently not singleton
-        return false;
+        // this class has no state and can be singleton
+        return true;
     }
 }

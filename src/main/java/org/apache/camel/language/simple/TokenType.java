@@ -17,7 +17,7 @@
 package org.apache.camel.language.simple;
 
 /**
- * Classifications of token types
+ * Classifications of known token types.
  */
 public enum TokenType {
 
