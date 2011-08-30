@@ -24,10 +24,6 @@ import java.util.List;
  */
 public class SimpleTokenizer {
 
-    // TODO: The known tokens could possible be static for the base line of known tokens
-    // then what we add in the future, is that the ${ } - function start/end can be
-    // configured by the end user.
-
     private final List<SimpleTokenType> knownTokens = new ArrayList<SimpleTokenType>();
 
     public SimpleTokenizer() {
@@ -74,44 +70,80 @@ public class SimpleTokenizer {
      *
      * @param expression  the input expression
      * @param index       the current index
+     * @param filter      defines the accepted token types to be returned (character is always used as fallback)
+     * @return the created token, will always return a token
+     */
+    public SimpleToken nextToken(String expression, int index, TokenType... filter) {
+        return doNextToken(expression, index, filter);
+    }
+
+    /**
+     * Create the next token
+     *
+     * @param expression  the input expression
+     * @param index       the current index
      * @return the created token, will always return a token
      */
     public SimpleToken nextToken(String expression, int index) {
-        // is it an escaped value
-        if (expression.charAt(index) == '\\' && index < expression.length() - 1) {
-            String text = "" + expression.charAt(index + 1);
-            // use 2 as length for escaped as we need to jump to the next symbol
-            return new SimpleToken(new SimpleTokenType(TokenType.escapedValue, text), index, 2);
-        }
+        return doNextToken(expression, index, null);
+    }
 
-        // is it a numeric value
-        StringBuilder sb = new StringBuilder();
-        boolean digit = true;
-        while (digit && index < expression.length()) {
-            digit = Character.isDigit(expression.charAt(index));
-            if (digit) {
-                char ch = expression.charAt(index);
-                sb.append(ch);
-                index++;
+    private SimpleToken doNextToken(String expression, int index, TokenType... filters) {
+
+        boolean escapedAllowed = acceptType(TokenType.escapedValue, filters);
+        if (escapedAllowed) {
+            // is it an escaped value
+            if (expression.charAt(index) == '\\' && index < expression.length() - 1) {
+                String text = "" + expression.charAt(index + 1);
+                // use 2 as length for escaped as we need to jump to the next symbol
+                return new SimpleToken(new SimpleTokenType(TokenType.escapedValue, text), index, 2);
             }
         }
-        if (sb.length() > 0) {
-            return new SimpleToken(new SimpleTokenType(TokenType.numericValue, sb.toString()), index);
+
+        boolean numericAllowed = acceptType(TokenType.numericValue, filters);
+        if (numericAllowed) {
+            // is it a numeric value
+            StringBuilder sb = new StringBuilder();
+            boolean digit = true;
+            while (digit && index < expression.length()) {
+                digit = Character.isDigit(expression.charAt(index));
+                if (digit) {
+                    char ch = expression.charAt(index);
+                    sb.append(ch);
+                    index++;
+                }
+            }
+            if (sb.length() > 0) {
+                return new SimpleToken(new SimpleTokenType(TokenType.numericValue, sb.toString()), index);
+            }
         }
 
         // it could be any of the known tokens
         String text = expression.substring(index);
         for (SimpleTokenType token : knownTokens) {
-            if (text.startsWith(token.getValue())) {
-                return new SimpleToken(token, index);
+            if (acceptType(token.getType(), filters)) {
+                if (text.startsWith(token.getValue())) {
+                    return new SimpleToken(token, index);
+                }
             }
-
         }
 
         // fallback and create a character token
         char ch = expression.charAt(index);
         SimpleToken token = new SimpleToken(new SimpleTokenType(TokenType.character, "" + ch), index);
         return token;
+    }
+
+    private boolean acceptType(TokenType type, TokenType... filters) {
+        if (filters == null || filters.length == 0) {
+            return true;
+        }
+        for (TokenType filter : filters) {
+            if (type == filter) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

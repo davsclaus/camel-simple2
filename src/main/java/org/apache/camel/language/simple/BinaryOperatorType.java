@@ -61,7 +61,7 @@ public enum BinaryOperatorType {
         throw new IllegalArgumentException("Operator not supported: " + text);
     }
 
-    public String getOperatorText(BinaryOperatorType operator) {
+    public static String getOperatorText(BinaryOperatorType operator) {
         if (operator == EQ) {
             return "==";
         } else if (operator == GT) {
@@ -96,6 +96,88 @@ public enum BinaryOperatorType {
             return "not range";
         }
         return "";
+    }
+
+    /**
+     * Parameter types a binary operator supports on the right hand side.
+     * <ul>
+     *     <li>Literal - Only literals enclosed by single quotes</li>
+     *     <li>LiteralWithFunction - literals which may have embedded functions enclosed by single quotes</li>
+     *     <li>Function - A function</li>
+     *     <li>NumericValue - A numeric value</li>
+     *     <li>BooleanValue - A boolean value</li>
+     *     <li>NullValue - A null value</li>
+     * </ul>
+     */
+    public enum ParameterType {
+        Literal, LiteralWithFunction, Function, NumericValue, BooleanValue, NullValue;
+
+        boolean isLiteralSupported() {
+            return this == Literal;
+        }
+
+        boolean isLiteralWithFunctionSupport() {
+            return this == LiteralWithFunction;
+        }
+
+        boolean isFunctionSupport() {
+            return this == Function;
+        }
+
+        boolean isNumericValueSupported() {
+            return this == NumericValue;
+        }
+
+        boolean isBooleanValueSupported() {
+            return this == BooleanValue;
+        }
+
+        boolean isNullValueSupported() {
+            return this == NullValue;
+        }
+    }
+
+    /**
+     * Returns the types of right hand side parameters this operator supports.
+     *
+     * @param operator the operator
+     * @return <tt>null</tt> if accepting all types, otherwise the array of accepted types
+     */
+    public static ParameterType[] supportedParameterTypes(BinaryOperatorType operator) {
+        if (operator == EQ) {
+            return null;
+        } else if (operator == GT) {
+            return null;
+        } else if (operator == GTE) {
+            return null;
+        } else if (operator == LT) {
+            return null;
+        } else if (operator == LTE) {
+            return null;
+        } else if (operator == NOT_EQ) {
+            return null;
+        } else if (operator == CONTAINS) {
+            return null;
+        } else if (operator == NOT_CONTAINS) {
+            return null;
+        } else if (operator == REGEX) {
+            return new ParameterType[]{ParameterType.Literal, ParameterType.Function};
+        } else if (operator == NOT_REGEX) {
+            return new ParameterType[]{ParameterType.Literal, ParameterType.Function};
+        } else if (operator == IN) {
+            return null;
+        } else if (operator == NOT_IN) {
+            return null;
+        } else if (operator == IS) {
+            return new ParameterType[]{ParameterType.LiteralWithFunction, ParameterType.Function};
+        } else if (operator == NOT_IS) {
+            return new ParameterType[]{ParameterType.LiteralWithFunction, ParameterType.Function};
+        } else if (operator == RANGE) {
+            return new ParameterType[]{ParameterType.LiteralWithFunction, ParameterType.Function};
+        } else if (operator == NOT_RANGE) {
+            return new ParameterType[]{ParameterType.LiteralWithFunction, ParameterType.Function};
+        }
+        return null;
     }
 
     @Override

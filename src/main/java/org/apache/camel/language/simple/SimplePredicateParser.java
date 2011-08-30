@@ -67,12 +67,19 @@ public class SimplePredicateParser extends BaseSimpleParser {
         nextToken();
         while (!token.getType().isEol()) {
             // predicate supports quotes, functions, operators and whitespaces
-            if (!singleQuotedText() && !doubleQuotedText() && !functionText() && !unaryOperator() && !binaryOperator() && !logicalOperator()
-                    && !token.getType().isWhitespace() && !token.getType().isEol()) {
+            if (!singleQuotedLiteralWithFunctionsText()
+                    && !doubleQuotedLiteralWithFunctionsText()
+                    && !functionText()
+                    && !unaryOperator()
+                    && !binaryOperator()
+                    && !logicalOperator()
+                    && !token.getType().isWhitespace()
+                    && !token.getType().isEol()) {
                 // okay the symbol was not one of the above, so its not supported
                 // use the previous index as that is where the problem is
                 throw new SimpleParserException("unexpected " + token.getType().getType() + " token", previousIndex);
             }
+            // take the next token
             nextToken();
         }
 
@@ -413,6 +420,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
     // the predicate parser understands a lot more than the expression parser
     // - single quoted = block of nodes enclosed by single quotes
     // - double quoted = block of nodes enclosed by double quotes
+    // - single quoted with functions = block of nodes enclosed by single quotes allowing embedded functions
+    // - double quoted with functions = block of nodes enclosed by double quotes allowing embedded functions
     // - function = simple functions such as ${body} etc
     // - numeric = numeric value
     // - boolean = boolean value
@@ -421,12 +430,12 @@ public class SimplePredicateParser extends BaseSimpleParser {
     // - binary operator = operator attached to both the left and right hand side nodes
     // - logical operator = operator attached to both the left and right hand side nodes
 
-    protected boolean singleQuotedText() {
+    protected boolean singleQuotedLiteralWithFunctionsText() {
         if (accept(TokenType.singleQuote)) {
-            nextToken();
+            nextToken(TokenType.singleQuote, TokenType.eol, TokenType.functionStart, TokenType.functionEnd, TokenType.escapedValue);
             while (!token.getType().isSingleQuote() && !token.getType().isEol()) {
                 // we need to loop until we find the ending single quote, or the eol
-                nextToken();
+                nextToken(TokenType.singleQuote, TokenType.eol, TokenType.functionStart, TokenType.functionEnd, TokenType.escapedValue);
             }
             expect(TokenType.singleQuote);
             return true;
@@ -434,12 +443,38 @@ public class SimplePredicateParser extends BaseSimpleParser {
         return false;
     }
 
-    protected boolean doubleQuotedText() {
+    protected boolean singleQuotedLiteralText() {
+        if (accept(TokenType.singleQuote)) {
+            nextToken(TokenType.singleQuote, TokenType.eol);
+            while (!token.getType().isSingleQuote() && !token.getType().isEol()) {
+                // we need to loop until we find the ending single quote, or the eol
+                nextToken(TokenType.singleQuote, TokenType.eol);
+            }
+            expect(TokenType.singleQuote);
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean doubleQuotedLiteralWithFunctionsText() {
         if (accept(TokenType.doubleQuote)) {
-            nextToken();
+            nextToken(TokenType.doubleQuote, TokenType.eol, TokenType.functionStart, TokenType.functionEnd, TokenType.escapedValue);
             while (!token.getType().isDoubleQuote() && !token.getType().isEol()) {
                 // we need to loop until we find the ending double quote, or the eol
-                nextToken();
+                nextToken(TokenType.doubleQuote, TokenType.eol, TokenType.functionStart, TokenType.functionEnd, TokenType.escapedValue);
+            }
+            expect(TokenType.doubleQuote);
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean doubleQuotedLiteralText() {
+        if (accept(TokenType.doubleQuote)) {
+            nextToken(TokenType.doubleQuote, TokenType.eol);
+            while (!token.getType().isDoubleQuote() && !token.getType().isEol()) {
+                // we need to loop until we find the ending double quote, or the eol
+                nextToken(TokenType.doubleQuote, TokenType.eol);
             }
             expect(TokenType.doubleQuote);
             return true;
@@ -449,10 +484,11 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
     protected boolean functionText() {
         if (accept(TokenType.functionStart)) {
+            nextToken(TokenType.functionEnd, TokenType.eol);
             nextToken();
             while (!token.getType().isFunctionEnd() && !token.getType().isEol()) {
                 // we need to loop until we find the ending function quote, or the eol
-                nextToken();
+                nextToken(TokenType.functionEnd, TokenType.eol);
             }
             expect(TokenType.functionEnd);
             return true;
@@ -472,19 +508,55 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
     protected boolean binaryOperator() {
         if (accept(TokenType.binaryOperator)) {
+            // remember the binary operator
+            BinaryOperatorType operatorType = BinaryOperatorType.asOperator(token.getText());
+
             nextToken();
             // there should be at least one whitespace after the operator
             expectAndAcceptMore(TokenType.whiteSpace);
 
-            // then we expect either some quoted text, another function, or a numeric, boolean or null value
-            if (singleQuotedText() || doubleQuotedText() || functionText() || numericValue() || booleanValue() || nullValue()) {
+            // okay a binary operator may not support all kind if preceding parameters, so we need to limit this
+            BinaryOperatorType.ParameterType[] types = BinaryOperatorType.supportedParameterTypes(operatorType);
+
+            // based on the parameter types the binary operator support, we need to set this state into
+            // the following booleans so we know how to proceed in the grammar
+            boolean literalWithFunctionsSupported = false;
+            boolean literalSupported = false;
+            boolean functionSupported = false;
+            boolean numericSupported = false;
+            boolean booleanSupported = false;
+            boolean nullSupported = false;
+            if (types == null || types.length == 0) {
+                literalWithFunctionsSupported = true; // favor literal with functions over without functions
+                functionSupported = true;
+                numericSupported = true;
+                booleanSupported = true;
+                nullSupported = true;
+            } else for (BinaryOperatorType.ParameterType parameterType : types) {
+                literalSupported |= parameterType.isLiteralSupported();
+                literalWithFunctionsSupported |= parameterType.isLiteralWithFunctionSupport();
+                functionSupported |= parameterType.isFunctionSupport();
+                nullSupported |= parameterType.isNumericValueSupported();
+                booleanSupported |= parameterType.isBooleanValueSupported();
+                nullSupported |= parameterType.isNullValueSupported();
+            }
+
+            // then we expect according to the parameter types supported by the given binary operator
+            if ((literalWithFunctionsSupported && singleQuotedLiteralWithFunctionsText())
+                    || (literalWithFunctionsSupported && doubleQuotedLiteralWithFunctionsText())
+                    || (literalSupported && singleQuotedLiteralText())
+                    || (literalSupported && doubleQuotedLiteralText())
+                    || (functionSupported && functionText())
+                    || (numericSupported && numericValue())
+                    || (booleanSupported && booleanValue())
+                    || (nullSupported && nullValue())) {
                 // then after the right hand side value, there should be a whitespace if there is more tokens
                 nextToken();
                 if (!token.getType().isEol()) {
                     expect(TokenType.whiteSpace);
                 }
             } else {
-                throw new SimpleParserException(token.getType() + " not supported by binary operator", token.getIndex());
+                throw new SimpleParserException("Binary operator: " + operatorType + " does not support token: " + token.getType(), token.getIndex());
             }
             return true;
         }
@@ -498,7 +570,12 @@ public class SimplePredicateParser extends BaseSimpleParser {
             expectAndAcceptMore(TokenType.whiteSpace);
 
             // then we expect either some quoted text, another function, or a numeric, boolean or null value
-            if (singleQuotedText() || doubleQuotedText() || functionText() || numericValue() || booleanValue() || nullValue()) {
+            if (singleQuotedLiteralWithFunctionsText()
+                    || doubleQuotedLiteralWithFunctionsText()
+                    || functionText()
+                    || numericValue()
+                    || booleanValue()
+                    || nullValue()) {
                 // then after the right hand side value, there should be a whitespace if there is more tokens
                 nextToken();
                 if (!token.getType().isEol()) {

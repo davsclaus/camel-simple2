@@ -5,12 +5,13 @@ An improved Simple expression language for Camel based on a recursive descent pa
 ## Current problems
 
 The current [Simple language](http://camel.apache.org/simple) in Camel has two drawbacks:
+
 * no parser to report exact position syntax errors
 * no ast
-* it does not differentiate whether its a org.apache.camel.Expression or org.apache.camel.Predicate
+* it does not differentiate whether its a 'org.apache.camel.Expression' or 'org.apache.camel.Predicate'
   being evaluated.
 * causes end users on a trial and error run in case their Camel routes does not route message
-  in the right destination in their, Content Based Router, using Simple languge.
+  in the right destination in their Content Based Router using Simple language.
 
 The current implementation is based on a sophisticated regular expression matcher and thus
 we have stretched as far we can take this.

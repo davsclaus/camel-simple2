@@ -67,6 +67,27 @@ public abstract class BaseSimpleParser {
     }
 
     /**
+     * Advances the parser position to the next known {@link SimpleToken}
+     * in the input.
+     *
+     * @param filter filter for accepted token types
+     */
+    protected void nextToken(TokenType... filter) {
+        if (index < expression.length()) {
+            SimpleToken next = tokenizer.nextToken(expression, index, filter);
+            // add token
+            tokens.add(next);
+            token = next;
+            // position index after the token
+            previousIndex = index;
+            index += next.getLength();
+        } else {
+            // end of tokens
+            token = new SimpleToken(new SimpleTokenType(TokenType.eol, null), index);
+        }
+    }
+
+    /**
      * Clears the parser state, which means it can be used for parsing a new input.
      */
     protected void clear() {
@@ -98,6 +119,9 @@ public abstract class BaseSimpleParser {
                 stack.push((Block) token);
             } else if (token instanceof BlockEnd) {
                 // end block is just an abstract mode, so we should not add it
+                if (stack.isEmpty()) {
+                    throw new SimpleParserException(token.getToken().getType().getType() + " has no matching start token", token.getToken().getIndex());
+                }
                 Block top = stack.pop();
                 answer.add(top);
             } else {

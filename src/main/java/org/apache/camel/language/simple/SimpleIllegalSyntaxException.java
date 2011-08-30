@@ -50,6 +50,10 @@ public class SimpleIllegalSyntaxException extends ExpressionIllegalSyntaxExcepti
 
     @Override
     public String getMessage() {
+        if (message == null) {
+            return "[null]";
+        }
+
         StringBuilder sb = new StringBuilder(message);
         if (index > -1) {
             sb.append(" at location ").append(index);

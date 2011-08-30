@@ -444,7 +444,7 @@ public class SimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (SimpleIllegalSyntaxException e) {
             assertEquals(11, e.getIndex());
-            assertTrue(e.getMessage().startsWith("is operator cannot accept null. A class type must be provided. at location 11"));
+            assertTrue(e.getMessage().startsWith("Binary operator: is does not support token: null at location 11"));
         }
     }
 
