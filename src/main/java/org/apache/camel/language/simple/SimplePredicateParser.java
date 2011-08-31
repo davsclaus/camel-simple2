@@ -541,7 +541,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
                 nullSupported |= parameterType.isNullValueSupported();
             }
 
-            // then we expect according to the parameter types supported by the given binary operator
+            // then we proceed in the grammar according to the parameter types supported by the given binary operator
             if ((literalWithFunctionsSupported && singleQuotedLiteralWithFunctionsText())
                     || (literalWithFunctionsSupported && doubleQuotedLiteralWithFunctionsText())
                     || (literalSupported && singleQuotedLiteralText())
