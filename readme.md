@@ -31,3 +31,16 @@ as shown below (eg the is a '=' missing in the equals operator)
                    *
 
 Then there is a error indicator that the problem is at position 15.
+
+
+## Todo
+
+* Possible polish the code a bit in the PredicateParser which parses binary operators, in terms
+of how we determine which succeeding tokens is valid.
+
+* The exceptions thrown during parsing should be polished to improve more details such as for example
+  a binary operator, which succeeding tokens it would be able to accept.
+
+* Add more unit tests, possible some which have plenty of operators
+
+* When the code is more ready and to be donated to Apache. We need some documentation of how to migrate.
