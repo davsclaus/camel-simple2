@@ -73,4 +73,40 @@ public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
         }
     }
 
+    public void testSimple2TwoAnd() throws Exception {
+        exchange.getIn().setBody("foo");
+
+        SimplePredicateParser parser = new SimplePredicateParser("${body} == 'foo' && && ${header} == 123");
+        try {
+            parser.parsePredicate();
+            fail("Should thrown exception");
+        } catch (SimpleIllegalSyntaxException e) {
+            assertEquals(20, e.getIndex());
+        }
+    }
+
+    public void testSimple2TwoOr() throws Exception {
+        exchange.getIn().setBody("foo");
+
+        SimplePredicateParser parser = new SimplePredicateParser("${body} == 'foo' || || ${header} == 123");
+        try {
+            parser.parsePredicate();
+            fail("Should thrown exception");
+        } catch (SimpleIllegalSyntaxException e) {
+            assertEquals(20, e.getIndex());
+        }
+    }
+
+    public void testSimple2TwoEq() throws Exception {
+        exchange.getIn().setBody("foo");
+
+        SimplePredicateParser parser = new SimplePredicateParser("${body} == == 'foo'");
+        try {
+            parser.parsePredicate();
+            fail("Should thrown exception");
+        } catch (SimpleIllegalSyntaxException e) {
+            assertEquals(11, e.getIndex());
+        }
+    }
+
 }

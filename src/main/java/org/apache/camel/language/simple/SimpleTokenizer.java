@@ -85,7 +85,7 @@ public class SimpleTokenizer {
      * @return the created token, will always return a token
      */
     public SimpleToken nextToken(String expression, int index) {
-        return doNextToken(expression, index, null);
+        return doNextToken(expression, index);
     }
 
     private SimpleToken doNextToken(String expression, int index, TokenType... filters) {

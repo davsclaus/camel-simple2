@@ -77,7 +77,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
                     && !token.getType().isEol()) {
                 // okay the symbol was not one of the above, so its not supported
                 // use the previous index as that is where the problem is
-                throw new SimpleParserException("unexpected " + token.getType().getType() + " token", previousIndex);
+                throw new SimpleParserException("Unexpected token " + token, previousIndex);
             }
             // take the next token
             nextToken();
@@ -310,17 +310,21 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
             if (token instanceof BinaryOperator) {
                 BinaryOperator binary = (BinaryOperator) token;
+
+                // remember the binary operator
+                String operator = binary.getOperator().toString();
+
                 if (left == null) {
-                    throw new SimpleParserException("no preceding token to use with binary operator ", token.getToken().getIndex());
+                    throw new SimpleParserException("Binary operator " + operator + " has no left hand side token", token.getToken().getIndex());
                 }
                 if (!binary.acceptLeftNode(left)) {
-                    throw new SimpleParserException("preceding token not applicable to use with binary operator", token.getToken().getIndex());
+                    throw new SimpleParserException("Binary operator " + operator + " does not support left hand side token " + left.getToken(), token.getToken().getIndex());
                 }
                 if (right == null) {
-                    throw new SimpleParserException("no succeeding token to use with binary operator", token.getToken().getIndex());
+                    throw new SimpleParserException("Binary operator " + operator + " has no right hand side token", token.getToken().getIndex());
                 }
                 if (!binary.acceptRightNode(right)) {
-                    throw new SimpleParserException("succeeding token not applicable to use with binary operator", token.getToken().getIndex());
+                    throw new SimpleParserException("Binary operator " + operator + " does not support right hand side token " + right.getToken(), token.getToken().getIndex());
                 }
 
                 // pop previous as we need to replace it with this binary operator
@@ -365,17 +369,21 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
             if (token instanceof LogicalOperator) {
                 LogicalOperator logical = (LogicalOperator) token;
+
+                // remember the logical operator
+                String operator = logical.getOperator().toString();
+
                 if (left == null) {
-                    throw new SimpleParserException("no preceding token to use with logical operator ", token.getToken().getIndex());
+                    throw new SimpleParserException("Logical operator " + operator + " has no left hand side token", token.getToken().getIndex());
                 }
                 if (!logical.acceptLeftNode(left)) {
-                    throw new SimpleParserException("preceding token not applicable to use with logical operator", token.getToken().getIndex());
+                    throw new SimpleParserException("Logical operator " + operator + " does not support left hand side token " + left.getToken(), token.getToken().getIndex());
                 }
                 if (right == null) {
-                    throw new SimpleParserException("no succeeding token to use with logical operator", token.getToken().getIndex());
+                    throw new SimpleParserException("Logical operator " + operator + " has no right hand side token", token.getToken().getIndex());
                 }
                 if (!logical.acceptRightNode(right)) {
-                    throw new SimpleParserException("succeeding token not applicable to use with logical operator", token.getToken().getIndex());
+                    throw new SimpleParserException("Logical operator " + operator + " does not support right hand side token " + left.getToken(), token.getToken().getIndex());
                 }
 
                 // pop previous as we need to replace it with this binary operator
@@ -556,7 +564,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
                     expect(TokenType.whiteSpace);
                 }
             } else {
-                throw new SimpleParserException("Binary operator: " + operatorType + " does not support token: " + token.getType(), token.getIndex());
+                throw new SimpleParserException("Binary operator " + operatorType + " does not support token " + token, token.getIndex());
             }
             return true;
         }
@@ -565,6 +573,9 @@ public class SimplePredicateParser extends BaseSimpleParser {
 
     protected boolean logicalOperator() {
         if (accept(TokenType.logicalOperator)) {
+            // remember the logical operator
+            LogicalOperatorType operatorType = LogicalOperatorType.asOperator(token.getText());
+
             nextToken();
             // there should be at least one whitespace after the operator
             expectAndAcceptMore(TokenType.whiteSpace);
@@ -582,7 +593,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
                     expect(TokenType.whiteSpace);
                 }
             } else {
-                throw new SimpleParserException(token.getType() + " not supported by logical operator", token.getIndex());
+                throw new SimpleParserException("Logical operator " + operatorType + " does not support token " + token, token.getIndex());
             }
             return true;
         }

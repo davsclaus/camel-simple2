@@ -142,4 +142,40 @@ public class Simple2ParserPredicateTest extends ExchangeTestSupport {
         assertTrue("Should match", pre.matches(exchange));
     }
 
+    public void testSimple2ManyAndLogical() throws Exception {
+        exchange.getIn().setBody("Hello");
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            exchange.getIn().setHeader("foo" + i, i);
+            sb.append("${header.foo").append(i).append("} == ").append(i);
+            if (i < 9) {
+                sb.append(" && ");
+            }
+        }
+
+        SimplePredicateParser parser = new SimplePredicateParser(sb.toString());
+        Predicate pre = parser.parsePredicate();
+
+        assertTrue("Should match", pre.matches(exchange));
+    }
+
+    public void testSimple2ManyOrLogical() throws Exception {
+        exchange.getIn().setBody("Hello");
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            sb.append("${header.foo").append(i).append("} == ").append(i);
+            if (i < 9) {
+                sb.append(" || ");
+            }
+        }
+        sb.append(" || ${body} == 'Hello'");
+
+        SimplePredicateParser parser = new SimplePredicateParser(sb.toString());
+        Predicate pre = parser.parsePredicate();
+
+        assertTrue("Should match", pre.matches(exchange));
+    }
+
 }
