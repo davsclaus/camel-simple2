@@ -109,13 +109,24 @@ public class Simple2Language implements Language, IsSingleton {
     }
 
     public Predicate createPredicate(String expression) {
-        SimplePredicateParser parser = new SimplePredicateParser(expression);
-        return parser.parsePredicate();
+        // support old simple language syntax
+        Predicate answer = SimpleBackwardsCompatibleParser.parsePredicate(expression);
+        if (answer == null) {
+            // use the new parser
+            SimplePredicateParser parser = new SimplePredicateParser(expression);
+            answer = parser.parsePredicate();
+        }
+        return answer;
     }
 
     public Expression createExpression(String expression) {
-        SimpleExpressionParser parser = new SimpleExpressionParser(expression);
-        Expression answer = parser.parseExpression();
+        // support old simple language syntax
+        Expression answer = SimpleBackwardsCompatibleParser.parseExpression(expression);
+        if (answer == null) {
+            // use the new parser
+            SimpleExpressionParser parser = new SimpleExpressionParser(expression);
+            answer = parser.parseExpression();
+        }
         if (resultType != null) {
             answer = ExpressionBuilder.convertToExpression(answer, resultType);
         }

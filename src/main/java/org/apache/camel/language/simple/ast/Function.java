@@ -37,10 +37,25 @@ public class Function extends Literal {
     @Override
     public Expression createExpression(String expression) {
         String function = text.toString();
-        return createSimpleExpression(function);
+        return createSimpleExpression(function, true);
     }
 
-    private Expression createSimpleExpression(String function) {
+    /**
+     * Creates a Camel {@link Expression} based on this model.
+     *
+     * @param expression the input string
+     * @param strict whether to throw exception if the expression was not a function,
+     *          otherwise <tt>null</tt> is returned
+     * @return the created {@link Expression}
+     * @throws org.apache.camel.language.simple.SimpleParserException
+     *          should be thrown if error parsing the model
+     */
+    public Expression createExpression(String expression, boolean strict) {
+        String function = text.toString();
+        return createSimpleExpression(function, strict);
+    }
+
+    private Expression createSimpleExpression(String function, boolean strict) {
         // return the function directly if we can create function without analyzing the prefix
         Expression answer = createSimpleExpressionDirectly(function);
         if (answer != null) {
@@ -236,7 +251,11 @@ public class Function extends Literal {
             return ExpressionBuilder.refExpression(remainder);
         }
 
-        throw new SimpleParserException("Unknown function: " + function, token.getIndex());
+        if (strict) {
+            throw new SimpleParserException("Unknown function: " + function, token.getIndex());
+        } else {
+            return null;
+        }
     }
 
     private Expression createSimpleExpressionDirectly(String expression) {

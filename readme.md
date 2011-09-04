@@ -32,10 +32,32 @@ as shown below (eg the is a '=' missing in the equals operator)
 
 Then there is a error indicator that the problem is at position 15.
 
+## Changes
+
+The simple language now operates in two modes
+- expression
+- predicate
+
+In the former mode, it operates in a template like mode, where dynamic ${ } placeholders is replaced.
+The binary and logical operators is not supported.
+
+In the latter mode, it operates in a predicate mode, where operators is in use.
+
+The reason for these two modes is that it makes it easier to use the language as a very simple template language
+as well as for predicates in the Camel routes. Having distinct modes helps the parser knowing this, and thus
+being able to parse and report invalid syntax errors much better.
+
+## Backwards compatible
+
+The simple language should be backwards compatible. However as the parser is now much better to pickup syntax errors
+it may report slight syntax errors which the old language did not.
+
+It is encouraged to always use dynamic ${ } placeholders for the simple functions to make it clear that its a function.
+However the old style of being able to do just "body" or "header.foo" is supported (but the style is considered @deprecated).
+This style will be removed in Camel 3.0.
 
 ## Todo
 
-* When the code is more ready and to be donated to Apache. We need some documentation of how to migrate.
+* Configure start and end tokens for function, eg to use something else than ${ }
 
-* Resolve camel-scala simple language problem due always being evaluated as Expression, despite it should
-  be Predicate when applicable.
+* SimpleTokenizer should initialize list of known tokens once
