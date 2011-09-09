@@ -93,12 +93,12 @@ public class SimplePredicateParser extends BaseSimpleParser {
         parseTokensAndCreateNodes();
         // compact and stack blocks (eg function start/end, quotes start/end, etc.)
         prepareBlocks();
-        // compact and stack unary operators
-        prepareUnaryOperators();
-        // compact and stack binary operators
-        prepareBinaryOperators();
-        // compact and stack logical operators
-        prepareLogicalOperators();
+        // compact and stack unary expressions
+        prepareUnaryExpressions();
+        // compact and stack binary expressions
+        prepareBinaryExpressions();
+        // compact and stack logical expressions
+        prepareLogicalExpressions();
 
         // create and return as a Camel predicate
         List<Predicate> predicates = createPredicates();
@@ -287,9 +287,9 @@ public class SimplePredicateParser extends BaseSimpleParser {
     }
 
     /**
-     * Prepares binary operators.
+     * Prepares binary expressions.
      * <p/>
-     * This process prepares the binary operators in the AST. This is done
+     * This process prepares the binary expressions in the AST. This is done
      * by linking the binary operator with both the right and left hand side
      * nodes, to have the AST graph updated and prepared properly.
      * <p/>
@@ -297,7 +297,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
      * to be used by Camel then the AST graph has a linked and prepared
      * graph of nodes which represent the input expression.
      */
-    private void prepareBinaryOperators() {
+    private void prepareBinaryExpressions() {
         Stack<SimpleNode> stack = new Stack<SimpleNode>();
 
         SimpleNode left = null;
@@ -346,9 +346,9 @@ public class SimplePredicateParser extends BaseSimpleParser {
     }
 
     /**
-     * Prepares logical operators.
+     * Prepares logical expressions.
      * <p/>
-     * This process prepares the logical operators in the AST. This is done
+     * This process prepares the logical expressions in the AST. This is done
      * by linking the logical operator with both the right and left hand side
      * nodes, to have the AST graph updated and prepared properly.
      * <p/>
@@ -356,7 +356,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
      * to be used by Camel then the AST graph has a linked and prepared
      * graph of nodes which represent the input expression.
      */
-    private void prepareLogicalOperators() {
+    private void prepareLogicalExpressions() {
         Stack<SimpleNode> stack = new Stack<SimpleNode>();
 
         SimpleNode left = null;
@@ -535,7 +535,9 @@ public class SimplePredicateParser extends BaseSimpleParser {
             boolean booleanSupported = false;
             boolean nullSupported = false;
             if (types == null || types.length == 0) {
-                literalWithFunctionsSupported = true; // favor literal with functions over without functions
+                literalWithFunctionsSupported = true;
+                // favor literal with functions over literals without functions
+                literalSupported = false;
                 functionSupported = true;
                 numericSupported = true;
                 booleanSupported = true;

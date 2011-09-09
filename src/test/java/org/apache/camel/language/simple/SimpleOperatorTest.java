@@ -59,6 +59,10 @@ public class SimpleOperatorTest extends LanguageTestSupport {
 
         assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} > 100", true);
         assertPredicate("${in.header.foo} == 'abc' && ${in.header.bar} < 200", true);
+
+        // the order can be reserved
+        assertPredicate("'abc' == ${in.header.foo} && 100 < ${in.header.bar}", true);
+        assertPredicate("'abc' == ${in.header.foo} && 200 > ${in.header.bar}", true);
     }
 
     @Test
@@ -304,20 +308,16 @@ public class SimpleOperatorTest extends LanguageTestSupport {
     public void testRegex() throws Exception {
         assertPredicate("${in.header.foo} regex '^a..$'", true);
         assertPredicate("${in.header.foo} regex '^ab.$'", true);
-
-        // TODO: escaped test in reg exp
-//        assertPredicate("${in.header.bar} regex '^\\d{3}'", true);
-//        assertPredicate("${in.header.bar} regex '^\\d{2}'", false);
+        assertPredicate("${in.header.bar} regex '^\\d{3}'", true);
+        assertPredicate("${in.header.bar} regex '^\\d{2}'", false);
     }
 
     @Test
     public void testNotRegex() throws Exception {
         assertPredicate("${in.header.foo} not regex '^a..$'", false);
         assertPredicate("${in.header.foo} not regex '^ab.$'", false);
-
-        // TODO: escaped test in reg exp
-//        assertPredicate("${in.header.bar} not regex '^\\d{3}'", false);
-//        assertPredicate("${in.header.bar} not regex '^\\d{2}'", true);
+        assertPredicate("${in.header.bar} not regex '^\\d{3}'", false);
+        assertPredicate("${in.header.bar} not regex '^\\d{2}'", true);
     }
 
     @Test

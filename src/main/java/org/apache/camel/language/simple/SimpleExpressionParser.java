@@ -70,7 +70,7 @@ public class SimpleExpressionParser extends BaseSimpleParser {
         // compact and stack blocks (eg function start/end)
         prepareBlocks();
         // compact and stack unary operators
-        prepareUnaryOperators();
+        prepareUnaryExpressions();
 
         // create and return as a Camel expression
         List<Expression> expressions = createExpressions();

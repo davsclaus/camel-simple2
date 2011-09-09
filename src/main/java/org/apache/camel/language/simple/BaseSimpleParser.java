@@ -142,9 +142,9 @@ public abstract class BaseSimpleParser {
     }
 
     /**
-     * Prepares unary operators.
+     * Prepares unary expressions.
      * <p/>
-     * This process prepares the unary operators in the AST. This is done
+     * This process prepares the unary expressions in the AST. This is done
      * by linking the unary operator with the left hand side node,
      * to have the AST graph updated and prepared properly.
      * <p/>
@@ -152,17 +152,21 @@ public abstract class BaseSimpleParser {
      * to be used by Camel then the AST graph has a linked and prepared
      * graph of nodes which represent the input expression.
      */
-    protected void prepareUnaryOperators() {
+    protected void prepareUnaryExpressions() {
         Stack<SimpleNode> stack = new Stack<SimpleNode>();
 
         for (SimpleNode node : nodes) {
             if (node instanceof UnaryExpression) {
-                UnaryExpression unary = (UnaryExpression) node;
+                UnaryExpression token = (UnaryExpression) node;
+
+                // remember the logical operator
+                String operator = token.getOperator().toString();
+
                 SimpleNode previous = stack.isEmpty() ? null : stack.pop();
                 if (previous == null) {
-                    throw new SimpleParserException("no preceding token to use with unary operator", unary.getToken().getIndex());
+                    throw new SimpleParserException("Unary operator " + operator + " has no left hand side token", token.getToken().getIndex());
                 } else {
-                    unary.acceptLeft(previous);
+                    token.acceptLeft(previous);
                 }
             }
             stack.push(node);
