@@ -16,42 +16,32 @@
  */
 package org.apache.camel.language.simple.ast;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
+import org.apache.camel.language.simple.SimpleParserException;
 import org.apache.camel.language.simple.SimpleToken;
 
 /**
- * Starts a function
+ * Represents a null expression.
  */
-public class FunctionStart extends BaseSimpleNode implements BlockStart {
+public class NullExpression extends BaseSimpleNode {
 
-    private LiteralNode literal;
-
-    public FunctionStart(SimpleToken token) {
+    public NullExpression(SimpleToken token) {
         super(token);
     }
 
     @Override
-    public String toString() {
-        // output a nice toString so it makes debugging easier as we can see the entire block
-        return "${" + literal + "}";
-    }
+    public Expression createExpression(String expression) throws SimpleParserException {
+        return new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                return null;
+            }
 
-    @Override
-    public Expression createExpression(String expression) {
-        Function function = new Function(this.getToken());
-        function.addText(literal.getText());
-        return function.createExpression(expression);
+            @Override
+            public String toString() {
+                return "null";
+            }
+        };
     }
-
-    @Override
-    public boolean acceptAndAddNode(SimpleNode node) {
-        // only accept literals as it contains the text for the function
-        if (node instanceof LiteralNode) {
-            literal = (LiteralNode) node;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
 }

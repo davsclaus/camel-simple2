@@ -25,14 +25,14 @@ import org.apache.camel.language.simple.UnaryOperatorType;
 import org.apache.camel.util.ObjectHelper;
 
 /**
- * Represents an unary operator in the AST
+ * Represents an unary expression in the AST
  */
-public class UnaryOperator extends BaseSimpleNode {
+public class UnaryExpression extends BaseSimpleNode {
 
     private UnaryOperatorType operator;
     private SimpleNode left;
 
-    public UnaryOperator(SimpleToken token) {
+    public UnaryExpression(SimpleToken token) {
         super(token);
         operator = UnaryOperatorType.asOperator(token.getText());
     }

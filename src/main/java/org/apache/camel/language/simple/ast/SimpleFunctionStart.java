@@ -20,17 +20,38 @@ import org.apache.camel.Expression;
 import org.apache.camel.language.simple.SimpleToken;
 
 /**
- * Ends a function
+ * Starts a function
  */
-public class FunctionEnd extends BaseSimpleNode implements BlockEnd {
+public class SimpleFunctionStart extends BaseSimpleNode implements BlockStart {
 
-    public FunctionEnd(SimpleToken token) {
+    private LiteralNode literal;
+
+    public SimpleFunctionStart(SimpleToken token) {
         super(token);
     }
 
     @Override
+    public String toString() {
+        // output a nice toString so it makes debugging easier as we can see the entire block
+        return "${" + literal + "}";
+    }
+
+    @Override
     public Expression createExpression(String expression) {
-        return null;
+        SimpleFunctionExpression function = new SimpleFunctionExpression(this.getToken());
+        function.addText(literal.getText());
+        return function.createExpression(expression);
+    }
+
+    @Override
+    public boolean acceptAndAddNode(SimpleNode node) {
+        // only accept literals as it contains the text for the function
+        if (node instanceof LiteralNode) {
+            literal = (LiteralNode) node;
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

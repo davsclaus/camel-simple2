@@ -19,7 +19,7 @@ package org.apache.camel.language.simple;
 import org.apache.camel.Expression;
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.PredicateBuilder;
-import org.apache.camel.language.simple.ast.Function;
+import org.apache.camel.language.simple.ast.SimpleFunctionExpression;
 
 /**
  * A backwards compatible parser, which supports the old simple language
@@ -51,9 +51,8 @@ public class SimpleBackwardsCompatibleParser {
 
     private static Expression doParseExpression(String expression) {
         // should have no function tokens
-        SimpleTokenizer tokenizer = new SimpleTokenizer();
         for (int i = 0; i < expression.length(); i++) {
-            SimpleToken token = tokenizer.nextToken(expression, i, TokenType.functionStart, TokenType.functionEnd);
+            SimpleToken token = SimpleTokenizer.nextToken(expression, i, TokenType.functionStart, TokenType.functionEnd);
             if (token.getType().getType() == TokenType.functionStart|| token.getType().getType() == TokenType.functionEnd) {
                 return null;
             }
@@ -61,7 +60,7 @@ public class SimpleBackwardsCompatibleParser {
 
         // okay there is no function tokens, then try to parse it as a simple function expression
         SimpleToken token = new SimpleToken(new SimpleTokenType(TokenType.functionStart, expression), 0);
-        Function function = new Function(token);
+        SimpleFunctionExpression function = new SimpleFunctionExpression(token);
         function.addText(expression);
         return function.createExpression(expression, false);
     }

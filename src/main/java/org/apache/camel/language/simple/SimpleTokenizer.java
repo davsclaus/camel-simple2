@@ -16,17 +16,18 @@
  */
 package org.apache.camel.language.simple;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Tokenizer to create {@link SimpleToken} from the input.
  */
 public class SimpleTokenizer {
 
-    private final List<SimpleTokenType> knownTokens = new ArrayList<SimpleTokenType>();
+    // use CopyOnWriteArrayList so we can modify it in the for loop when changing function start/end tokens
+    private static final List<SimpleTokenType> knownTokens = new CopyOnWriteArrayList<SimpleTokenType>();
 
-    public SimpleTokenizer() {
+    static {
         // add known tokens
         knownTokens.add(new SimpleTokenType(TokenType.whiteSpace, " "));
         knownTokens.add(new SimpleTokenType(TokenType.singleQuote, "'"));
@@ -65,6 +66,32 @@ public class SimpleTokenizer {
         knownTokens.add(new SimpleTokenType(TokenType.logicalOperator, "||"));
     }
 
+    public static void changeFunctionStartToken(String... startToken) {
+        for (SimpleTokenType type : knownTokens) {
+            if (type.getType() == TokenType.functionStart) {
+                knownTokens.remove(type);
+            }
+        }
+
+        // add in start as its a more common token to be used
+        for (String token : startToken) {
+            knownTokens.add(0, new SimpleTokenType(TokenType.functionStart, token));
+        }
+    }
+
+    public static void changeFunctionEndToken(String... endToken) {
+        for (SimpleTokenType type : knownTokens) {
+            if (type.getType() == TokenType.functionEnd) {
+                knownTokens.remove(type);
+            }
+        }
+
+        // add in start as its a more common token to be used
+        for (String token : endToken) {
+            knownTokens.add(0, new SimpleTokenType(TokenType.functionEnd, token));
+        }
+    }
+
     /**
      * Create the next token
      *
@@ -73,7 +100,7 @@ public class SimpleTokenizer {
      * @param filter      defines the accepted token types to be returned (character is always used as fallback)
      * @return the created token, will always return a token
      */
-    public SimpleToken nextToken(String expression, int index, TokenType... filter) {
+    public static SimpleToken nextToken(String expression, int index, TokenType... filter) {
         return doNextToken(expression, index, filter);
     }
 
@@ -84,11 +111,11 @@ public class SimpleTokenizer {
      * @param index       the current index
      * @return the created token, will always return a token
      */
-    public SimpleToken nextToken(String expression, int index) {
+    public static SimpleToken nextToken(String expression, int index) {
         return doNextToken(expression, index);
     }
 
-    private SimpleToken doNextToken(String expression, int index, TokenType... filters) {
+    private static SimpleToken doNextToken(String expression, int index, TokenType... filters) {
 
         boolean escapedAllowed = acceptType(TokenType.escapedValue, filters);
         if (escapedAllowed) {
@@ -134,7 +161,7 @@ public class SimpleTokenizer {
         return token;
     }
 
-    private boolean acceptType(TokenType type, TokenType... filters) {
+    private static boolean acceptType(TokenType type, TokenType... filters) {
         if (filters == null || filters.length == 0) {
             return true;
         }

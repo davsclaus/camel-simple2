@@ -24,7 +24,7 @@ import org.apache.camel.language.simple.ast.Block;
 import org.apache.camel.language.simple.ast.BlockEnd;
 import org.apache.camel.language.simple.ast.BlockStart;
 import org.apache.camel.language.simple.ast.SimpleNode;
-import org.apache.camel.language.simple.ast.UnaryOperator;
+import org.apache.camel.language.simple.ast.UnaryExpression;
 
 /**
  * Base class for Simple language parser.
@@ -35,7 +35,6 @@ import org.apache.camel.language.simple.ast.UnaryOperator;
 public abstract class BaseSimpleParser {
 
     protected final String expression;
-    protected final SimpleTokenizer tokenizer;
     protected final List<SimpleToken> tokens = new ArrayList<SimpleToken>();
     protected final List<SimpleNode> nodes = new ArrayList<SimpleNode>();
     protected SimpleToken token;
@@ -44,7 +43,6 @@ public abstract class BaseSimpleParser {
 
     protected BaseSimpleParser(String expression) {
         this.expression = expression;
-        this.tokenizer = new SimpleTokenizer();
     }
 
     /**
@@ -53,7 +51,7 @@ public abstract class BaseSimpleParser {
      */
     protected void nextToken() {
         if (index < expression.length()) {
-            SimpleToken next = tokenizer.nextToken(expression, index);
+            SimpleToken next = SimpleTokenizer.nextToken(expression, index);
             // add token
             tokens.add(next);
             token = next;
@@ -74,7 +72,7 @@ public abstract class BaseSimpleParser {
      */
     protected void nextToken(TokenType... filter) {
         if (index < expression.length()) {
-            SimpleToken next = tokenizer.nextToken(expression, index, filter);
+            SimpleToken next = SimpleTokenizer.nextToken(expression, index, filter);
             // add token
             tokens.add(next);
             token = next;
@@ -158,8 +156,8 @@ public abstract class BaseSimpleParser {
         Stack<SimpleNode> stack = new Stack<SimpleNode>();
 
         for (SimpleNode node : nodes) {
-            if (node instanceof UnaryOperator) {
-                UnaryOperator unary = (UnaryOperator) node;
+            if (node instanceof UnaryExpression) {
+                UnaryExpression unary = (UnaryExpression) node;
                 SimpleNode previous = stack.isEmpty() ? null : stack.pop();
                 if (previous == null) {
                     throw new SimpleParserException("no preceding token to use with unary operator", unary.getToken().getIndex());

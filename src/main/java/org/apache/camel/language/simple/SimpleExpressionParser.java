@@ -21,12 +21,12 @@ import java.util.List;
 
 import org.apache.camel.Expression;
 import org.apache.camel.builder.ExpressionBuilder;
-import org.apache.camel.language.simple.ast.FunctionEnd;
-import org.apache.camel.language.simple.ast.FunctionStart;
-import org.apache.camel.language.simple.ast.Literal;
+import org.apache.camel.language.simple.ast.SimpleFunctionEnd;
+import org.apache.camel.language.simple.ast.SimpleFunctionStart;
+import org.apache.camel.language.simple.ast.LiteralExpression;
 import org.apache.camel.language.simple.ast.LiteralNode;
 import org.apache.camel.language.simple.ast.SimpleNode;
-import org.apache.camel.language.simple.ast.UnaryOperator;
+import org.apache.camel.language.simple.ast.UnaryExpression;
 
 /**
  * A parser to parse simple language as a Camel {@link Expression}
@@ -111,7 +111,7 @@ public class SimpleExpressionParser extends BaseSimpleParser {
             // if no token was created then its a character/whitespace/escaped symbol
             // which we need to add together in the same image
             if (imageToken == null) {
-                imageToken = new Literal(token);
+                imageToken = new LiteralExpression(token);
             }
             imageToken.addText(token.getText());
         }
@@ -125,11 +125,11 @@ public class SimpleExpressionParser extends BaseSimpleParser {
     private SimpleNode createNode(SimpleToken token) {
         // expression only support functions and unary operators
         if (token.getType().isFunctionStart()) {
-            return new FunctionStart(token);
+            return new SimpleFunctionStart(token);
         } else if (token.getType().isFunctionEnd()) {
-            return new FunctionEnd(token);
+            return new SimpleFunctionEnd(token);
         } else if (token.getType().isUnary()) {
-            return new UnaryOperator(token);
+            return new UnaryExpression(token);
         }
 
         // by returning null, we will let the parser determine what to do

@@ -26,15 +26,15 @@ import org.apache.camel.language.simple.SimpleToken;
 import org.apache.camel.util.ObjectHelper;
 
 /**
- * Represents an logical operator in the AST
+ * Represents a logical expression in the AST
  */
-public class LogicalOperator extends BaseSimpleNode {
+public class LogicalExpression extends BaseSimpleNode {
 
     private LogicalOperatorType operator;
     private SimpleNode left;
     private SimpleNode right;
 
-    public LogicalOperator(SimpleToken token) {
+    public LogicalExpression(SimpleToken token) {
         super(token);
         operator = LogicalOperatorType.asOperator(token.getText());
     }

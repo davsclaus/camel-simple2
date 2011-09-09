@@ -25,19 +25,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.camel.Expression;
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.PredicateBuilder;
-import org.apache.camel.language.simple.ast.BinaryOperator;
+import org.apache.camel.language.simple.ast.BinaryExpression;
 import org.apache.camel.language.simple.ast.DoubleQuoteEnd;
 import org.apache.camel.language.simple.ast.DoubleQuoteStart;
-import org.apache.camel.language.simple.ast.FunctionEnd;
-import org.apache.camel.language.simple.ast.FunctionStart;
-import org.apache.camel.language.simple.ast.Literal;
+import org.apache.camel.language.simple.ast.SimpleFunctionEnd;
+import org.apache.camel.language.simple.ast.SimpleFunctionStart;
+import org.apache.camel.language.simple.ast.LiteralExpression;
 import org.apache.camel.language.simple.ast.LiteralNode;
-import org.apache.camel.language.simple.ast.LogicalOperator;
-import org.apache.camel.language.simple.ast.NullNode;
+import org.apache.camel.language.simple.ast.LogicalExpression;
+import org.apache.camel.language.simple.ast.NullExpression;
 import org.apache.camel.language.simple.ast.SimpleNode;
 import org.apache.camel.language.simple.ast.SingleQuoteEnd;
 import org.apache.camel.language.simple.ast.SingleQuoteStart;
-import org.apache.camel.language.simple.ast.UnaryOperator;
+import org.apache.camel.language.simple.ast.UnaryExpression;
 
 /**
  * A parser to parse simple language as a Camel {@link Predicate}
@@ -147,7 +147,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
                     lastSingle = node;
                 } else if (node instanceof DoubleQuoteStart) {
                     lastDouble = node;
-                } else if (node instanceof FunctionStart) {
+                } else if (node instanceof SimpleFunctionStart) {
                     lastFunction = node;
                 }
 
@@ -165,7 +165,7 @@ public class SimplePredicateParser extends BaseSimpleParser {
             // if no token was created then its a character/whitespace/escaped symbol
             // which we need to add together in the same image
             if (imageToken == null) {
-                imageToken = new Literal(token);
+                imageToken = new LiteralExpression(token);
             }
             imageToken.addText(token.getText());
         }
@@ -205,10 +205,10 @@ public class SimplePredicateParser extends BaseSimpleParser {
                                   AtomicBoolean startFunction) {
         if (token.getType().isFunctionStart()) {
             startFunction.set(true);
-            return new FunctionStart(token);
+            return new SimpleFunctionStart(token);
         } else if (token.getType().isFunctionEnd()) {
             startFunction.set(false);
-            return new FunctionEnd(token);
+            return new SimpleFunctionEnd(token);
         }
 
         // if we are inside a function, then we do not support any other kind of tokens
@@ -251,13 +251,13 @@ public class SimplePredicateParser extends BaseSimpleParser {
         // okay we are not inside a function or quote, so we want to support operators
         // and the special null value as well
         if (token.getType().isUnary()) {
-            return new UnaryOperator(token);
+            return new UnaryExpression(token);
         } else if (token.getType().isBinary()) {
-            return new BinaryOperator(token);
+            return new BinaryExpression(token);
         } else if (token.getType().isLogical()) {
-            return new LogicalOperator(token);
+            return new LogicalExpression(token);
         } else if (token.getType().isNullValue()) {
-            return new NullNode(token);
+            return new NullExpression(token);
         }
 
         // by returning null, we will let the parser determine what to do
@@ -308,8 +308,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
             SimpleNode token = nodes.get(i);
             SimpleNode right = i < nodes.size() - 1 ? nodes.get(i + 1) : null;
 
-            if (token instanceof BinaryOperator) {
-                BinaryOperator binary = (BinaryOperator) token;
+            if (token instanceof BinaryExpression) {
+                BinaryExpression binary = (BinaryExpression) token;
 
                 // remember the binary operator
                 String operator = binary.getOperator().toString();
@@ -367,8 +367,8 @@ public class SimplePredicateParser extends BaseSimpleParser {
             SimpleNode token = nodes.get(i);
             SimpleNode right = i < nodes.size() - 1 ? nodes.get(i + 1) : null;
 
-            if (token instanceof LogicalOperator) {
-                LogicalOperator logical = (LogicalOperator) token;
+            if (token instanceof LogicalExpression) {
+                LogicalExpression logical = (LogicalExpression) token;
 
                 // remember the logical operator
                 String operator = logical.getOperator().toString();

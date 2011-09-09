@@ -21,6 +21,7 @@ import org.apache.camel.IsSingleton;
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.ExpressionBuilder;
 import org.apache.camel.spi.Language;
+import org.apache.camel.util.ObjectHelper;
 
 /**
  * A <a href="http://camel.apache.org/simple.html">simple language</a>
@@ -142,5 +143,13 @@ public class Simple2Language implements Language, IsSingleton {
         answer.setResultType(resultType);
         return answer.createExpression(expression);
     }
+
+    public static void changeFunctionStartToken(String... startToken) {
+        SimpleTokenizer.changeFunctionStartToken(startToken);
+    }
     
+    public static void changeFunctionEndToken(String... endToken) {
+        SimpleTokenizer.changeFunctionEndToken(endToken);
+    }
+
 }

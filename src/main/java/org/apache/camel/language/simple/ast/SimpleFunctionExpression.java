@@ -28,9 +28,9 @@ import org.apache.camel.util.StringHelper;
  * Represents one of built-in functions of the
  * <a href="http://camel.apache.org/simple.html">simple language</a>
  */
-public class Function extends Literal {
+public class SimpleFunctionExpression extends LiteralExpression {
 
-    public Function(SimpleToken token) {
+    public SimpleFunctionExpression(SimpleToken token) {
         super(token);
     }
 

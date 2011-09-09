@@ -23,11 +23,11 @@ import org.apache.camel.language.simple.SimpleToken;
 /**
  * Represents literals in the AST.
  */
-public class Literal extends BaseSimpleNode implements LiteralNode {
+public class LiteralExpression extends BaseSimpleNode implements LiteralNode {
 
     protected StringBuilder text = new StringBuilder();
 
-    public Literal(SimpleToken token) {
+    public LiteralExpression(SimpleToken token) {
         super(token);
     }
 

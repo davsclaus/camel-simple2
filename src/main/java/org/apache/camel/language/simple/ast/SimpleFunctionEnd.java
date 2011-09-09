@@ -16,32 +16,21 @@
  */
 package org.apache.camel.language.simple.ast;
 
-import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
-import org.apache.camel.language.simple.SimpleParserException;
 import org.apache.camel.language.simple.SimpleToken;
 
 /**
- * A node which represents a null value.
+ * Ends a function
  */
-public class NullNode extends BaseSimpleNode {
+public class SimpleFunctionEnd extends BaseSimpleNode implements BlockEnd {
 
-    public NullNode(SimpleToken token) {
+    public SimpleFunctionEnd(SimpleToken token) {
         super(token);
     }
 
     @Override
-    public Expression createExpression(String expression) throws SimpleParserException {
-        return new Expression() {
-            @Override
-            public <T> T evaluate(Exchange exchange, Class<T> type) {
-                return null;
-            }
-
-            @Override
-            public String toString() {
-                return "null";
-            }
-        };
+    public Expression createExpression(String expression) {
+        return null;
     }
+
 }

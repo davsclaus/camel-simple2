@@ -56,8 +56,3 @@ It is encouraged to always use dynamic ${ } placeholders for the simple function
 However the old style of being able to do just "body" or "header.foo" is supported (but the style is considered @deprecated).
 This style will be removed in Camel 3.0.
 
-## Todo
-
-* Configure start and end tokens for function, eg to use something else than ${ }
-
-* SimpleTokenizer should initialize list of known tokens once

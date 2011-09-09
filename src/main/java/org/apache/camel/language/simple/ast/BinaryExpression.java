@@ -35,9 +35,9 @@ import org.apache.camel.language.simple.SimpleToken;
 import org.apache.camel.util.ObjectHelper;
 
 /**
- * Represents a binary operator in the AST.
+ * Represents a binary expression in the AST.
  */
-public class BinaryOperator extends BaseSimpleNode {
+public class BinaryExpression extends BaseSimpleNode {
 
     // this is special for the range operator where you define the range as from..to (where from and to are numbers)
     private static final Pattern RANGE_PATTERN = Pattern.compile("^(\\d+)(\\.\\.)(\\d+)$");
@@ -46,7 +46,7 @@ public class BinaryOperator extends BaseSimpleNode {
     private SimpleNode left;
     private SimpleNode right;
 
-    public BinaryOperator(SimpleToken token) {
+    public BinaryExpression(SimpleToken token) {
         super(token);
         operator = BinaryOperatorType.asOperator(token.getText());
     }
