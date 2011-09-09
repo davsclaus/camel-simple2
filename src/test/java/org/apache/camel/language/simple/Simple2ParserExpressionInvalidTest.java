@@ -23,7 +23,7 @@ import org.apache.camel.test.ExchangeTestSupport;
  */
 public class Simple2ParserExpressionInvalidTest extends ExchangeTestSupport {
 
-    public void testSimple2FunctionInvalid() throws Exception {
+    public void testSimpleFunctionInvalid() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("${body${foo}}");
         try {
             parser.parseExpression();
@@ -33,7 +33,7 @@ public class Simple2ParserExpressionInvalidTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2UnbalanceFunction() throws Exception {
+    public void testSimpleUnbalanceFunction() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("${body is a nice day");
         try {
             parser.parseExpression();
@@ -43,7 +43,7 @@ public class Simple2ParserExpressionInvalidTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2UnknownFunction() throws Exception {
+    public void testSimpleUnknownFunction() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("Hello ${foo} how are you?");
         try {
             parser.parseExpression();

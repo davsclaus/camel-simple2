@@ -30,7 +30,7 @@ public class Simple2BackwardsCompatibleTest extends LanguageTestSupport {
     }
 
     @Test
-    public void testSimple2Body() throws Exception {
+    public void testSimpleBody() throws Exception {
         assertExpression(exchange, "${body}", "<hello id='m123'>world!</hello>");
         assertExpression(exchange, "$simple{body}", "<hello id='m123'>world!</hello>");
         assertExpression(exchange, "body", "<hello id='m123'>world!</hello>");
@@ -40,7 +40,7 @@ public class Simple2BackwardsCompatibleTest extends LanguageTestSupport {
     }
 
     @Test
-    public void testSimple2Header() throws Exception {
+    public void testSimpleHeader() throws Exception {
         exchange.getIn().setHeader("foo", 123);
         assertExpression(exchange, "${header.foo}", 123);
         assertExpression(exchange, "header.foo", 123);

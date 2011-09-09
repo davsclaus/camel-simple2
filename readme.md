@@ -38,9 +38,8 @@ The simple language now operates in two modes
 - expression
 - predicate
 
-In the former mode, it operates in a template like mode, where dynamic ${ } placeholders is replaced.
-The binary and logical operators is not supported.
-
+In the former mode, it operates in a template like mode, where dynamic ${ } placeholders
+is replaced (string interpolation). The binary and logical operators is not supported.
 In the latter mode, it operates in a predicate mode, where operators is in use.
 
 The reason for these two modes is that it makes it easier to use the language as a very simple template language

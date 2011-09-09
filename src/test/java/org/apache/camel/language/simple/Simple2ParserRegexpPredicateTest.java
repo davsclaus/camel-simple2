@@ -27,7 +27,7 @@ import org.junit.Test;
 public class Simple2ParserRegexpPredicateTest extends ExchangeTestSupport {
 
     @Test
-    public void testSimple2Regexp() throws Exception {
+    public void testSimpleRegexp() throws Exception {
         exchange.getIn().setBody("12.34.5678");
 
         SimplePredicateParser parser = new SimplePredicateParser("${body} regex '^\\d{2}\\.\\d{2}\\.\\d{4}$'");

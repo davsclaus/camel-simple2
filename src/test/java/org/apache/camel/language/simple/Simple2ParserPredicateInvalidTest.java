@@ -23,7 +23,7 @@ import org.apache.camel.test.ExchangeTestSupport;
  */
 public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
 
-    public void testSimple2EqFunctionInvalid() throws Exception {
+    public void testSimpleEqFunctionInvalid() throws Exception {
         exchange.getIn().setBody("Hello");
         exchange.getIn().setHeader("high", true);
 
@@ -36,7 +36,7 @@ public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2InvalidSymbol() throws Exception {
+    public void testSimpleInvalidSymbol() throws Exception {
         exchange.getIn().setBody("Hello");
         exchange.getIn().setHeader("high", true);
 
@@ -49,7 +49,7 @@ public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2UnevenSingleQuote() throws Exception {
+    public void testSimpleUnevenSingleQuote() throws Exception {
         exchange.getIn().setBody("foo");
 
         SimplePredicateParser parser = new SimplePredicateParser("${body} == 'foo");
@@ -61,7 +61,7 @@ public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2UnevenDoubleQuote() throws Exception {
+    public void testSimpleUnevenDoubleQuote() throws Exception {
         exchange.getIn().setBody("foo");
 
         SimplePredicateParser parser = new SimplePredicateParser("${body} == \"foo");
@@ -73,7 +73,7 @@ public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2TwoAnd() throws Exception {
+    public void testSimpleTwoAnd() throws Exception {
         exchange.getIn().setBody("foo");
 
         SimplePredicateParser parser = new SimplePredicateParser("${body} == 'foo' && && ${header} == 123");
@@ -85,7 +85,7 @@ public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2TwoOr() throws Exception {
+    public void testSimpleTwoOr() throws Exception {
         exchange.getIn().setBody("foo");
 
         SimplePredicateParser parser = new SimplePredicateParser("${body} == 'foo' || || ${header} == 123");
@@ -97,7 +97,7 @@ public class Simple2ParserPredicateInvalidTest extends ExchangeTestSupport {
         }
     }
 
-    public void testSimple2TwoEq() throws Exception {
+    public void testSimpleTwoEq() throws Exception {
         exchange.getIn().setBody("foo");
 
         SimplePredicateParser parser = new SimplePredicateParser("${body} == == 'foo'");

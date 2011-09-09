@@ -30,7 +30,7 @@ public class Simple2Test extends LanguageTestSupport {
     }
 
     @Test
-    public void testSimple2Constant() throws Exception {
+    public void testSimpleConstant() throws Exception {
         assertExpression(exchange, "Hello", "Hello");
         assertExpression(exchange, "'Hello'", "'Hello'");
         assertExpression(exchange, "\"Hello\"", "\"Hello\"");
@@ -40,27 +40,27 @@ public class Simple2Test extends LanguageTestSupport {
     }
 
     @Test
-    public void testSimple2Body() throws Exception {
+    public void testSimpleBody() throws Exception {
         assertExpression(exchange, "${body}", "<hello id='m123'>world!</hello>");
         assertExpression(exchange, "$simple{body}", "<hello id='m123'>world!</hello>");
     }
 
     @Test
-    public void testSimple2ConstantAndBody() throws Exception {
+    public void testSimpleConstantAndBody() throws Exception {
         exchange.getIn().setBody("Camel");
         assertExpression(exchange, "Hi ${body} how are you", "Hi Camel how are you");
         assertExpression(exchange, "'Hi '${body}' how are you'", "'Hi 'Camel' how are you'");
     }
 
     @Test
-    public void testSimple2ConstantAndBodyAndHeader() throws Exception {
+    public void testSimpleConstantAndBodyAndHeader() throws Exception {
         exchange.getIn().setBody("Camel");
         exchange.getIn().setHeader("foo", "Tiger");
         assertExpression(exchange, "Hi ${body} how are ${header.foo}", "Hi Camel how are Tiger");
     }
 
     @Test
-    public void testSimple2EqOperator() throws Exception {
+    public void testSimpleEqOperator() throws Exception {
         exchange.getIn().setBody("Camel");
         assertPredicate(exchange, "${body} == 'Tiger'", false);
         assertPredicate(exchange, "${body} == 'Camel'", true);

@@ -17,7 +17,6 @@
 package org.apache.camel.language.simple;
 
 import org.apache.camel.Expression;
-import org.apache.camel.ExpressionIllegalSyntaxException;
 import org.apache.camel.test.ExchangeTestSupport;
 
 /**
@@ -25,21 +24,21 @@ import org.apache.camel.test.ExchangeTestSupport;
  */
 public class Simple2ParserExpressionTest extends ExchangeTestSupport {
 
-    public void testSimple2ParserEol() throws Exception {
+    public void testSimpleParserEol() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("Hello");
         Expression exp = parser.parseExpression();
 
         assertEquals("Hello", exp.evaluate(exchange, String.class));
     }
 
-    public void testSimple2SingleQuote() throws Exception {
+    public void testSimpleSingleQuote() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("'Hello'");
         Expression exp = parser.parseExpression();
 
         assertEquals("'Hello'", exp.evaluate(exchange, String.class));
     }
 
-    public void testSimple2SingleQuoteWithFunction() throws Exception {
+    public void testSimpleSingleQuoteWithFunction() throws Exception {
         exchange.getIn().setBody("World");
         SimpleExpressionParser parser = new SimpleExpressionParser("'Hello ${body} how are you?'");
         Expression exp = parser.parseExpression();
@@ -47,7 +46,7 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         assertEquals("'Hello World how are you?'", exp.evaluate(exchange, String.class));
     }
 
-    public void testSimple2SingleQuoteWithFunctionBodyAs() throws Exception {
+    public void testSimpleSingleQuoteWithFunctionBodyAs() throws Exception {
         exchange.getIn().setBody("World");
         SimpleExpressionParser parser = new SimpleExpressionParser("'Hello ${bodyAs(String)} how are you?'");
         Expression exp = parser.parseExpression();
@@ -55,14 +54,14 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         assertEquals("'Hello World how are you?'", exp.evaluate(exchange, String.class));
     }
 
-    public void testSimple2SingleQuoteEol() throws Exception {
+    public void testSimpleSingleQuoteEol() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("'Hello' World");
         Expression exp = parser.parseExpression();
 
         assertEquals("'Hello' World", exp.evaluate(exchange, String.class));
     }
 
-    public void testSimple2Function() throws Exception {
+    public void testSimpleFunction() throws Exception {
         exchange.getIn().setBody("World");
         SimpleExpressionParser parser = new SimpleExpressionParser("${body}");
         Expression exp = parser.parseExpression();
@@ -70,21 +69,21 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         assertEquals("World", exp.evaluate(exchange, String.class));
    }
 
-    public void testSimple2SingleQuoteWithEscape() throws Exception {
+    public void testSimpleSingleQuoteWithEscape() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("Pay 200\\$ today");
         Expression exp = parser.parseExpression();
 
         assertEquals("Pay 200$ today", exp.evaluate(exchange, String.class));
     }
 
-    public void testSimple2SingleQuoteWithEscapeEnd() throws Exception {
+    public void testSimpleSingleQuoteWithEscapeEnd() throws Exception {
         SimpleExpressionParser parser = new SimpleExpressionParser("Pay 200\\$");
         Expression exp = parser.parseExpression();
 
         assertEquals("Pay 200$", exp.evaluate(exchange, String.class));
     }
 
-    public void testSimple2UnaryInc() throws Exception {
+    public void testSimpleUnaryInc() throws Exception {
         exchange.getIn().setBody("122");
         SimpleExpressionParser parser = new SimpleExpressionParser("${body}++");
         Expression exp = parser.parseExpression();
@@ -92,12 +91,21 @@ public class Simple2ParserExpressionTest extends ExchangeTestSupport {
         assertEquals("123", exp.evaluate(exchange, String.class));
     }
 
-    public void testSimple2UnaryDec() throws Exception {
+    public void testSimpleUnaryDec() throws Exception {
         exchange.getIn().setBody("122");
         SimpleExpressionParser parser = new SimpleExpressionParser("${body}--");
         Expression exp = parser.parseExpression();
 
         assertEquals("121", exp.evaluate(exchange, String.class));
+    }
+
+    public void testSimpleEscape() throws Exception {
+        exchange.getIn().setBody("World");
+        // we escape the $ which mean it will not be a function
+        SimpleExpressionParser parser = new SimpleExpressionParser("Hello \\${body\\} how are you?");
+        Expression exp = parser.parseExpression();
+
+        assertEquals("Hello ${body} how are you?", exp.evaluate(exchange, String.class));
     }
 
 }
