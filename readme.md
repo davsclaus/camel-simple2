@@ -2,6 +2,11 @@
 
 An improved Simple expression language for Camel based on a recursive descent parser.
 
+## Migrated to Apache
+
+This project has been donated and migrated to the Apache Camel project, and will be part of the next
+upcoming Apache Camel 2.9.0 release.
+
 ## Current problems
 
 The current [Simple language](http://camel.apache.org/simple) in Camel has two drawbacks:
